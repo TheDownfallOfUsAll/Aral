@@ -21,6 +21,13 @@ Passwords are stored as scrypt hashes, and login sessions are random, expiring t
 
 Vercel runs API routes as serverless functions and does not provide a persistent local SQLite file. The `/api` function uses Turso (hosted libSQL, compatible with SQLite) for production users and sessions. Create a Turso database, then add `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` to the Vercel project’s Environment Variables for Production (and Preview if needed). Redeploy after adding the variables. The function initializes its schema on first use.
 
+The serverless auth route will fail with a clear 503 if these variables are missing, instead of crashing with a generic runtime error. The exact Vercel settings are:
+
+```bash
+TURSO_DATABASE_URL=libsql://your-database-name-your-account.turso.io
+TURSO_AUTH_TOKEN=your-turso-auth-token
+```
+
 Local accounts in `data/arallink.sqlite` are separate from Turso accounts and are not copied automatically. Create accounts again on the deployed app or migrate them intentionally. Never commit database tokens or passwords.
 
 ## Increment 1 scope

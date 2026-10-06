@@ -22,7 +22,11 @@ const getClient = () => {
   const url = process.env.TURSO_DATABASE_URL
   const authToken = process.env.TURSO_AUTH_TOKEN
   if (!url || !authToken) {
-    throw new Error('TURSO_DATABASE_URL and TURSO_AUTH_TOKEN must be configured.')
+    const error = new Error(
+      'Authentication is not configured for this Vercel deployment. Add TURSO_DATABASE_URL and TURSO_AUTH_TOKEN in Project Settings → Environment Variables, then redeploy.',
+    )
+    error.status = 503
+    throw error
   }
   client = createClient({ url, authToken })
   return client
