@@ -104,6 +104,20 @@ body {
   color: #89849e;
 }
 
+.welcome-date-time {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.live-clock {
+  color: #6d6686;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .45px;
+  white-space: nowrap;
+}
+
 .hero-banner {
   min-height: 250px;
   height: auto;
