@@ -10,6 +10,7 @@ import {
 import { createReadStream, mkdirSync } from 'node:fs'
 import { extname, join, normalize, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { ensureLearningSchema, handleLearningApi, handleStudentApi, handleStudentLogin } from './learning-api.mjs'
 
 const directory = fileURLToPath(new URL('.', import.meta.url))
 const databaseDirectory = resolve(directory, '../data')
@@ -35,6 +36,20 @@ const mimeTypes = {
 
 mkdirSync(databaseDirectory, { recursive: true })
 const database = new DatabaseSync(databasePath)
+const learningDatabase = {
+  execute: async ({ sql, args = [] }) => {
+    const statement = database.prepare(sql)
+    if (/^(SELECT|WITH|PRAGMA)\b/i.test(sql.trim())) {
+      return { rows: statement.all(...args) }
+    }
+    const result = statement.run(...args)
+    return {
+      rows: [],
+      lastInsertRowid: Number(result.lastInsertRowid),
+      rowsAffected: Number(result.changes),
+    }
+  },
+}
 database.exec(`
   PRAGMA foreign_keys = ON;
   PRAGMA journal_mode = WAL;
@@ -182,6 +197,24 @@ const checkRateLimit = (request) => {
 }
 
 const handleApi = async (request, response, url) => {
+  if (url.pathname === '/api/student/login') {
+    await ensureLearningSchema(learningDatabase)
+    return handleStudentLogin(request, response, learningDatabase)
+  }
+  if (url.pathname.startsWith('/api/student/')) {
+    await ensureLearningSchema(learningDatabase)
+    return handleStudentApi(request, response, learningDatabase, url.pathname)
+  }
+
+  if (url.pathname.startsWith('/api/learning/')) {
+    const user = getAuthenticatedUser(request)
+    if (!user) return json(response, 401, { error: 'Sign in to access learning data.' })
+    await ensureLearningSchema(learningDatabase)
+    return handleLearningApi(
+      request, response, learningDatabase, url.pathname, url.searchParams, user.id,
+    )
+  }
+
   if (request.method === 'GET' && url.pathname === '/api/me') {
     const user = getAuthenticatedUser(request)
     return json(response, 200, { user })

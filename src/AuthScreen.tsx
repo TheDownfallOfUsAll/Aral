@@ -2,18 +2,24 @@ import { useState, type FormEvent } from 'react'
 import './AuthScreen.css'
 
 type AuthUser = { id: number; name: string; email: string }
+type StudentSession = { id: number; name: string; grade: number; classroom: { id: number; name: string } }
 type AuthMode = 'login' | 'register'
 
-export function AuthScreen({ onAuthenticated, rememberedAccounts, connectionError = '', notice = '' }: {
+export function AuthScreen({ onAuthenticated, onStudentAuthenticated, rememberedAccounts, connectionError = '', notice = '' }: {
   onAuthenticated: (user: AuthUser) => void
+  onStudentAuthenticated: (student: StudentSession) => void
   rememberedAccounts: AuthUser[]
   connectionError?: string
   notice?: string
 }) {
   const [mode, setMode] = useState<AuthMode>('login')
+  const [studentLogin, setStudentLogin] = useState(false)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [joinCode, setJoinCode] = useState('')
+  const [studentName, setStudentName] = useState('')
+  const [studentPin, setStudentPin] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -22,17 +28,26 @@ export function AuthScreen({ onAuthenticated, rememberedAccounts, connectionErro
     setBusy(true)
     setError('')
     try {
-      const response = await fetch(`/api/${mode}`, {
+      const studentCredentials = { joinCode, name: studentName, pin: studentPin }
+      const response = await fetch(studentLogin ? '/api/student/login' : `/api/${mode}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify(studentLogin ? studentCredentials : { name, email, password }),
       })
-      const result = await response.json() as { user?: AuthUser; error?: string }
-      if (!response.ok || !result.user) {
+      const result = await response.json() as { user?: AuthUser; student?: Omit<StudentSession, 'classroom'>; classroom?: StudentSession['classroom']; error?: string }
+      if (studentLogin && response.ok && result.student && result.classroom) {
+        onStudentAuthenticated({ ...result.student, classroom: result.classroom })
+        return
+      }
+      if (!studentLogin && response.ok && result.user) {
+        onAuthenticated(result.user)
+        return
+      }
+      if (!response.ok) {
         setError(result.error ?? 'We couldn’t complete that request. Please try again.')
         return
       }
-      onAuthenticated(result.user)
+      setError('We couldn’t complete that request. Please try again.')
     } catch {
       setError('We couldn’t connect to the sign-in service. Please check that the app server is running.')
     } finally {
@@ -82,16 +97,19 @@ export function AuthScreen({ onAuthenticated, rememberedAccounts, connectionErro
             <span className="auth-brand-mark">∑</span>
             <span>arallink<span>.</span></span>
           </div>
-          <span className="auth-form-kicker">{mode === 'login' ? 'WELCOME BACK' : 'YOUR ADVENTURE STARTS HERE'}</span>
-          <h2>{mode === 'login' ? 'Let’s get learning.' : 'Create your account.'}</h2>
-          <p className="auth-intro">{mode === 'login' ? 'Sign in to pick up where the fun begins.' : 'Join AralLink and make numbers your new favorite.'}</p>
+          <span className="auth-form-kicker">{studentLogin ? 'STUDENT SIGN IN' : mode === 'login' ? 'TEACHER WELCOME' : 'YOUR CLASSROOM STARTS HERE'}</span>
+          <h2>{studentLogin ? 'Ready to learn?' : mode === 'login' ? 'Let’s get learning.' : 'Create your teacher account.'}</h2>
+          <p className="auth-intro">{studentLogin ? 'Enter your classroom code, name, and teacher-issued PIN.' : mode === 'login' ? 'Sign in to pick up where the fun begins.' : 'Start your classroom, add student profiles, and save every learning step.'}</p>
 
-          <div className="auth-tabs" role="tablist" aria-label="Account access">
-            <button type="button" role="tab" aria-selected={mode === 'login'} className={mode === 'login' ? 'selected' : ''} onClick={() => switchMode('login')}>Sign in</button>
-            <button type="button" role="tab" aria-selected={mode === 'register'} className={mode === 'register' ? 'selected' : ''} onClick={() => switchMode('register')}>Create account</button>
-          </div>
+          {studentLogin ? <button className="auth-account-switch" type="button" onClick={() => { setStudentLogin(false); setError('') }}>Teacher sign in</button> : <>
+            <div className="auth-tabs" role="tablist" aria-label="Account access">
+              <button type="button" role="tab" aria-selected={mode === 'login'} className={mode === 'login' ? 'selected' : ''} onClick={() => switchMode('login')}>Teacher sign in</button>
+              <button type="button" role="tab" aria-selected={mode === 'register'} className={mode === 'register' ? 'selected' : ''} onClick={() => switchMode('register')}>Create teacher account</button>
+            </div>
+            <button className="auth-account-switch" type="button" onClick={() => { setStudentLogin(true); setMode('login'); setError('') }}>Student sign in</button>
+          </>}
 
-          {rememberedAccounts.length > 0 && (
+          {!studentLogin && rememberedAccounts.length > 0 && (
             <section className="remembered-accounts" aria-label="Accounts used on this device">
               <span className="remembered-accounts-title">Accounts on this device</span>
               <div>
@@ -119,27 +137,33 @@ export function AuthScreen({ onAuthenticated, rememberedAccounts, connectionErro
           {notice && <p className="auth-notice" role="status">{notice}</p>}
           {connectionError && <p className="auth-error" role="alert">{connectionError}</p>}
           <form className="auth-form" onSubmit={submit} noValidate>
-            {mode === 'register' && (
+            {studentLogin ? <>
+              <label><span>Classroom code</span><input autoComplete="off" maxLength={8} required value={joinCode} onChange={(event) => setJoinCode(event.target.value.toUpperCase())} placeholder="8-letter classroom code" /></label>
+              <label><span>Student name</span><input autoComplete="username" maxLength={80} required value={studentName} onChange={(event) => setStudentName(event.target.value)} placeholder="Your name" /></label>
+              <label><span>PIN</span><input autoComplete="current-password" type="password" inputMode="numeric" minLength={4} maxLength={8} required value={studentPin} onChange={(event) => setStudentPin(event.target.value.replace(/\D/g, '').slice(0, 8))} placeholder="4 to 8 digits" /></label>
+            </> : <>
+              {mode === 'register' && (
+                <label>
+                  <span>Your name</span>
+                  <input autoComplete="name" maxLength={80} required value={name} onChange={(event) => setName(event.target.value)} placeholder="Jamie James" />
+                </label>
+              )}
               <label>
-                <span>Your name</span>
-                <input autoComplete="name" maxLength={80} required value={name} onChange={(event) => setName(event.target.value)} placeholder="Jamie James" />
+                <span>Email address</span>
+                <input autoComplete="email" type="email" maxLength={254} required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" />
               </label>
-            )}
-            <label>
-              <span>Email address</span>
-              <input autoComplete="email" type="email" maxLength={254} required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" />
-            </label>
-            <label>
-              <span>Password</span>
-              <input autoComplete={mode === 'login' ? 'current-password' : 'new-password'} type="password" minLength={8} maxLength={128} required value={password} onChange={(event) => setPassword(event.target.value)} placeholder={mode === 'login' ? 'Enter your password' : 'At least 8 characters'} />
-            </label>
+              <label>
+                <span>Password</span>
+                <input autoComplete={mode === 'login' ? 'current-password' : 'new-password'} type="password" minLength={8} maxLength={128} required value={password} onChange={(event) => setPassword(event.target.value)} placeholder={mode === 'login' ? 'Enter your password' : 'At least 8 characters'} />
+              </label>
+            </>}
             {error && <p className="auth-error" role="alert">{error}</p>}
             <button className="auth-submit" type="submit" disabled={busy}>
-              {busy ? 'Please wait…' : mode === 'login' ? 'Sign in to AralLink' : 'Create my account'}
+              {busy ? 'Please wait…' : studentLogin ? 'Sign in to classroom' : mode === 'login' ? 'Sign in to AralLink' : 'Create my account'}
               {!busy && <span aria-hidden="true">→</span>}
             </button>
           </form>
-          <p className="auth-privacy">Your account is stored securely on this device.</p>
+          <p className="auth-privacy">{studentLogin ? 'Your teacher gives you the classroom code and your PIN.' : 'Teacher accounts are private. Student profiles are managed inside your classroom.'}</p>
         </div>
       </section>
     </main>

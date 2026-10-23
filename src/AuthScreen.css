@@ -509,3 +509,105 @@
     transition-duration: .01ms !important;
   }
 }
+
+.auth-page {
+  color: #243632;
+  background: #fffefa;
+}
+
+.auth-showcase {
+  background-color: #e7f2e7;
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 43px, rgb(49 111 85 / 5%) 44px),
+    repeating-linear-gradient(90deg, transparent 0 43px, rgb(49 111 85 / 5%) 44px),
+    linear-gradient(135deg, #dcefe3 0%, #eaf1df 56%, #e8f1eb 100%);
+}
+
+.auth-brand,
+.auth-mobile-brand,
+.auth-form-wrap h2,
+.auth-showcase-copy h1 {
+  color: #294239;
+}
+
+.auth-brand > span:last-child > span,
+.auth-mobile-brand > span:last-child > span,
+.auth-showcase-copy h1 span {
+  color: #287c68;
+}
+
+.auth-brand-mark {
+  background: linear-gradient(145deg, #328b70, #246b5b);
+  box-shadow: 0 8px 18px rgb(38 114 91 / 22%);
+}
+
+.auth-kicker,
+.auth-form-kicker {
+  color: #39866d;
+}
+
+.auth-showcase-copy p,
+.auth-intro {
+  color: #687e73;
+}
+
+.auth-number {
+  color: #287c68;
+  box-shadow: 0 16px 32px rgb(55 92 69 / 11%);
+}
+
+.number-three {
+  background: #fff0d9;
+  color: #bb7046;
+}
+
+.number-five {
+  background: #e2f2e5;
+  color: #428765;
+}
+
+.auth-plus,
+.auth-equals {
+  color: #568f77;
+}
+
+.auth-form-side {
+  background-color: #fffefa;
+  background-image: linear-gradient(90deg, rgb(232 242 233 / 40%), transparent 18%);
+}
+
+.auth-tabs {
+  border-color: #dfe9e2;
+  background: #eff5ef;
+}
+
+.auth-tabs button.selected {
+  color: #286c59;
+}
+
+.remembered-account:hover,
+.remembered-account.selected {
+  border-color: #b7d5c2;
+  background: #f1f8f1;
+}
+
+.auth-form input:focus {
+  border-color: #72ad8a;
+  box-shadow: 0 0 0 3px rgb(66 135 101 / 12%);
+}
+
+.auth-notice {
+  border-color: #c9dfd0;
+  background: #eff7ee;
+  color: #286c59;
+}
+
+.auth-submit {
+  background: linear-gradient(135deg, #328b70, #246b5b);
+  box-shadow: 0 8px 18px rgb(38 114 91 / 20%);
+}
+
+.auth-submit:not(:disabled):hover {
+  background: linear-gradient(135deg, #277b64, #1f5f51);
+  box-shadow: 0 11px 22px rgb(38 114 91 / 27%);
+}

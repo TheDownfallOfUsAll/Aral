@@ -6,6 +6,7 @@ import {
   timingSafeEqual,
 } from 'node:crypto'
 import { promisify } from 'node:util'
+import { ensureLearningSchema, handleLearningApi, handleStudentApi, handleStudentLogin } from '../server/learning-api.mjs'
 
 const scrypt = promisify(scryptCallback)
 const sessionCookie = 'aral_session'
@@ -280,6 +281,22 @@ export default async function handler(request, response) {
     }
     const db = getClient()
     await ensureSchema(db)
+    if (url.pathname === '/api/student/login') {
+      await ensureLearningSchema(db)
+      return await handleStudentLogin(request, response, db)
+    }
+    if (url.pathname.startsWith('/api/student/')) {
+      await ensureLearningSchema(db)
+      return await handleStudentApi(request, response, db, url.pathname)
+    }
+    if (url.pathname.startsWith('/api/learning/')) {
+      const user = await getAuthenticatedUser(request, db)
+      if (!user) return json(response, 401, { error: 'Sign in to access learning data.' })
+      await ensureLearningSchema(db)
+      return await handleLearningApi(
+        request, response, db, url.pathname, url.searchParams, user.id,
+      )
+    }
     await handleApi(request, response, db, url.pathname)
   } catch (error) {
     console.error('Vercel auth request failed:', error)
