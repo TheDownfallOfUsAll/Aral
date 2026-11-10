@@ -1,56 +1,138 @@
 # AralLink for Numbers
 
-A desktop-first web app for Grade 1 addition and subtraction. Teachers register with email and password, create student profiles in their own classroom, and track lessons, practice results, progress, badges, and notifications. Students sign in with a teacher's classroom code, their classroom name, and a teacher-issued PIN. Student learning data is stored in SQLite locally and Turso on Vercel.
+AralLink for Numbers is a desktop-first learning app for Grade 1 addition and subtraction. Teachers can create a classroom and student profiles, then follow lesson progress, practice results, stars, badges, and notifications. Student sign-in is available for classroom practice.
 
-## Run locally
+This project is currently scoped to Increment 1. Prototype and classroom data are kept locally when using the local development setup; no mobile screens or mobile application are included.
 
-Use Node.js 24 or newer (the local API uses Node's built-in SQLite support).
+## Requirements
 
-```powershell
-npm install
-npm run dev
+- Node.js 24 or newer. The local API uses Node's built-in SQLite support.
+- npm (included with Node.js).
+- Git, if you are cloning the repository.
+
+Check that Node and npm are available in a terminal:
+
+```bash
+node --version
+npm --version
 ```
 
-Open the local address shown by Vite. The development command starts both the Vite frontend and the local API. Create a teacher account, add a student from the new-classroom screen, and start at the first lesson. Classroom, student, lesson, practice, progress, badge, and notification data is saved in `data/arallink.sqlite`. The signed-in teacher name can be changed under **Settings**.
+The Node version should be `v24` or newer.
 
-For a production-style local run, build the frontend and then run `npm start`. The Node server serves `dist` and the authentication API on port 3001. Set `PORT` to change the server port. To verify a production build, run `npm run build`.
+## Get started locally
 
-Run backend tests with `npm test`.
+1. Clone the repository and enter its folder:
 
-Passwords are stored as scrypt hashes, and login sessions are random, expiring tokens stored hashed in SQLite and sent in HTTP-only, same-site cookies. Names and email addresses for accounts used on the current browser are remembered locally to make switching accounts easier; passwords are never stored in the browser. For an HTTPS deployment, set `HOST=0.0.0.0` and `COOKIE_SECURE=true` so the server is reachable by the platform and session cookies are sent only over HTTPS.
+   ```bash
+   git clone https://github.com/TheDownfallOfUsAll/Aral.git
+   cd Aral
+   ```
+
+   If you already have the project, open a terminal in its root folder (the folder containing `package.json`).
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Start the development servers:
+
+   ```bash
+   npm run dev
+   ```
+
+   This starts the Vite web app and the local API. Keep this terminal open while you use the app. Open the frontend URL printed by Vite (usually `http://localhost:5173`). The API runs at `http://127.0.0.1:3001`.
+
+4. Try the teacher and student flow:
+   - Register a teacher account with a name, email address, and password (at least 8 characters).
+   - Create a classroom and add a student from the classroom setup or Classroom area.
+   - Use the classroom's join code and the student's name and PIN to sign in as that student.
+   - Open lessons or practice and check progress from the teacher view.
+
+5. Stop the development servers with **Ctrl+C** in the terminal.
+
+The local SQLite database is created automatically at `data/arallink.sqlite`. It holds local accounts, sessions, and learning data. Keep it private, back it up before deleting or replacing it, and do not commit it to the repository. Local accounts and data are separate from any deployed environment.
+
+## Verify changes
+
+Run these commands from the repository root before submitting changes:
+
+```bash
+npm run lint
+npm run build
+npm test
+```
+
+- `npm run lint` checks the source with Oxlint.
+- `npm run build` runs the TypeScript build and creates the production frontend in `dist`.
+- `npm test` runs the Node.js test suite.
+
+## Run the production build locally
+
+After installing dependencies, build the frontend and start the Node server:
+
+```bash
+npm run build
+npm start
+```
+
+The server serves the built frontend and API on port `3001` by default. Open `http://127.0.0.1:3001`. To use another port, set `PORT` before starting the server. For example, in PowerShell:
+
+```powershell
+$env:PORT = "3002"
+npm start
+```
+
+On macOS or Linux:
+
+```bash
+PORT=3002 npm start
+```
 
 ## Deploy to Vercel
 
-Vercel runs API routes as serverless functions and does not provide a persistent local SQLite file. The `/api` function uses Turso (hosted libSQL, compatible with SQLite) for production users and sessions. Create a Turso database, then add `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` to the Vercel project’s Environment Variables for Production (and Preview if needed). Redeploy after adding the variables. The function initializes its schema on first use.
+The Vercel deployment uses serverless API routes. Vercel's serverless environment does not provide a persistent local SQLite database, so production accounts and sessions use Turso (hosted libSQL, SQLite-compatible) instead. Create a Turso database and configure these environment variables in the Vercel project settings for the environments you deploy:
 
-The serverless auth route will fail with a clear 503 if these variables are missing, instead of crashing with a generic runtime error. The exact Vercel settings are:
-
-```bash
+```text
 TURSO_DATABASE_URL=libsql://your-database-name-your-account.turso.io
 TURSO_AUTH_TOKEN=your-turso-auth-token
 ```
 
-Local accounts in `data/arallink.sqlite` are separate from Turso accounts and are not copied automatically. Create accounts again on the deployed app or migrate them intentionally. Never commit database tokens or passwords.
+Redeploy after configuring the variables. The API returns a clear `503` response if the required Turso settings are missing. Local records in `data/arallink.sqlite` are not copied to Turso; create accounts again in the deployed app or migrate data intentionally. Never commit database files, credentials, or tokens.
 
 ## Increment 1 scope
 
-- Addition and subtraction practice within 10
-- Student progress, stars, badges, and lesson completion views
+- Grade 1 addition and subtraction practice within 10
+- Student lessons, progress, stars, badges, and completion views
 - Teacher classroom roster and progress overview
-- Guardian/teacher notification feed
+- Classroom notifications for teachers and guardians
 - Desktop web experience only; mobile screens and a mobile app are out of scope
 
 ## Learning API
 
-Teacher learning routes require the HTTP-only `aral_session` cookie. Each teacher account owns a classroom; teachers create and remove student profiles there. The Classroom tab shows a generated classroom code and teacher-only answer keys. Students sign in using that code, their classroom name, and a teacher-issued 4–8 digit PIN. PINs are stored as salted scrypt hashes, student sessions use a separate HTTP-only cookie, and student requests are scoped to their profile. Student lesson and guide responses omit answer keys; the server grades submitted answers and returns explanations afterward. New student profiles begin with zero progress and lesson one unlocked. Student IDs are checked against their teacher's classroom before teacher routes read or write progress.
+Teacher learning routes require the HTTP-only `aral_session` cookie. Each teacher account owns its classroom and manages its student profiles. Student sign-in uses a separate HTTP-only session cookie.
 
-- `GET /api/learning/classroom` returns the classroom and roster with weekly activity, accuracy, stars, and completed lesson counts.
-- `POST /api/learning/students` creates a student with `{ "name": "...", "pin": "1234" }`; `PUT /api/learning/students/:id/pin` resets a PIN and revokes that student's active sessions; `DELETE /api/learning/students/:id` removes that student's learning records.
-- `GET /api/learning/classroom/guides` returns teacher guides and answer keys.
-- `GET /api/learning/lessons?studentId=:id` returns lesson catalog entries and saved progress.
-- `PUT /api/learning/lessons/:lessonId/progress` saves `{ "studentId": 1, "progress": 0 }` with progress between 0 and 100.
-- `POST /api/learning/practice-sessions` saves `{ "studentId": 1, "activityId": "quick-practice", "correctCount": 3, "questionCount": 4, "durationSeconds": 90 }`; five sessions award the Number Explorer badge once.
-- `GET /api/learning/progress?studentId=:id` returns lifetime and current-week results, completed lessons, stars, and earned badges.
-- `GET /api/learning/notifications` lists classroom notifications; `PATCH /api/learning/notifications/read` marks them read.
+| Method and route | Description |
+|---|---|
+| `GET /api/learning/classroom` | Classroom and roster, including weekly activity, accuracy, stars, and completed lesson counts. |
+| `POST /api/learning/students` | Create a student with `{ "name": "...", "pin": "1234" }`. |
+| `PUT /api/learning/students/:id/pin` | Reset a student's PIN and revoke that student's active sessions. |
+| `DELETE /api/learning/students/:id` | Remove a student from the classroom. |
+| `GET /api/learning/classroom/guides` | Get teacher guides and answer keys. |
+| `GET /api/learning/lessons?studentId=:id` | Get lesson catalog entries and saved progress. |
+| `PUT /api/learning/lessons/:lessonId/progress` | Save progress from 0 to 100, for example `{ "studentId": 1, "progress": 0 }`. |
+| `POST /api/learning/practice-sessions` | Save a practice result, for example `{ "studentId": 1, "activityId": "quick-practice", "correctCount": 3, "questionCount": 4, "durationSeconds": 90 }`. |
+| `GET /api/learning/progress?studentId=:id` | Get lifetime and current-week results, completed lessons, stars, and earned badges. |
+| `GET /api/learning/notifications` | List classroom notifications. |
+| `PATCH /api/learning/notifications/read` | Mark notifications as read. |
 
-Student sign-in uses `POST /api/student/login` with `{ "joinCode": "CLASSCODE", "name": "...", "pin": "1234" }`. Student sessions use a separate HTTP-only cookie from teacher sessions. `/api/student/lessons` and `/api/student/classroom/guides` omit answer keys; `POST /api/student/practice` and teacher practice submissions are graded on the server and return worked explanations after submission.
+Five saved practice sessions award the Number Explorer badge.
+
+Student sign-in uses `POST /api/student/login` with `{ "joinCode": "CLASSCODE", "name": "...", "pin": "1234" }`. Other student routes are under `/api/student/`.
+
+## Authentication and data notes
+
+Teacher passwords are stored as scrypt hashes. Session tokens are random, expiring values stored as hashes in SQLite and sent in HTTP-only, same-site cookies. Names and email addresses entered for accounts are stored in the database. Use test data for local development and protect database backups and deployment credentials.
+
+The standalone Spring Boot coursework API in [`backend/README.md`](backend/README.md) is a separate application and database. `npm run dev` does not start it or route the frontend to it.
