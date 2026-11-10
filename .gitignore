@@ -13,6 +13,7 @@ dist-ssr
 *.local
 data/
 **/target/
+backend/*.db*
 
 # Editor directories and files
 .vscode/*
