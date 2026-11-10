@@ -30,7 +30,7 @@ public class StudentEntity {
     @Column(name = "created_at", nullable = false, updatable = false)
     private long createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "classroom_id", nullable = false)
     private ClassroomEntity classroom;
 

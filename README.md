@@ -54,3 +54,30 @@ Teacher learning routes require the HTTP-only `aral_session` cookie. Each teache
 - `GET /api/learning/notifications` lists classroom notifications; `PATCH /api/learning/notifications/read` marks them read.
 
 Student sign-in uses `POST /api/student/login` with `{ "joinCode": "CLASSCODE", "name": "...", "pin": "1234" }`. Student sessions use a separate HTTP-only cookie from teacher sessions. `/api/student/lessons` and `/api/student/classroom/guides` omit answer keys; `POST /api/student/practice` and teacher practice submissions are graded on the server and return worked explanations after submission.
+
+## Spring Boot classroom management
+
+The separate Spring Boot backend provides a desktop management page for
+teachers, classrooms, and students. Start the backend from the `backend`
+directory, then start the frontend with `npm run dev`. Open
+`http://localhost:5173/management`, or choose **Open teacher & student
+management** from the sign-in page.
+
+The overview shows the live date and time in the `Asia/Manila` time zone. Use
+the Teachers, Classrooms, and Students sections to create, view, update, and
+delete records. Add a teacher first, create a classroom and assign its teacher,
+then create students and assign them to a classroom.
+
+During Vite development, `/spring-api` is proxied to the Spring Boot API at
+`http://127.0.0.1:8081` by default, keeping the existing Node `/api` routes
+unchanged. If Spring Boot is running on another port, set the target before
+starting Vite. For example, to use port 8080:
+
+```powershell
+$env:VITE_SPRING_API_TARGET = "http://127.0.0.1:8080"
+npm run dev
+```
+
+The management screen requires both servers to be running. This Vite proxy
+configuration is for local development and preview; the existing production
+Node server does not automatically proxy requests to Spring Boot.

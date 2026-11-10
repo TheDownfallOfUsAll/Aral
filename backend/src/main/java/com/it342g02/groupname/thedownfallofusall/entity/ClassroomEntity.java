@@ -36,7 +36,7 @@ public class ClassroomEntity {
     @Column(name = "created_at", nullable = false, updatable = false)
     private long createdAt;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_user_id", nullable = false, unique = true)
     private TeacherEntity owner;
 

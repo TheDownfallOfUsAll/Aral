@@ -3,6 +3,7 @@ import './App.css'
 import './AppEnhancements.css'
 import { AuthScreen } from './AuthScreen'
 import { LearningDashboard } from './LearningDashboard'
+import { ManagementDashboard } from './ManagementDashboard'
 import { StudentDashboard } from './StudentDashboard'
 
 type AuthUser = { id: number; name: string; email: string }
@@ -49,6 +50,7 @@ function App() {
   }, [rememberedAccounts])
 
   useEffect(() => {
+    if (window.location.pathname === '/management') return
     let active = true
     Promise.all([fetch('/api/me'), fetch('/api/student/me')])
       .then(async ([teacherResponse, studentResponse]) => {
@@ -124,6 +126,7 @@ function App() {
     setUser(updatedUser)
   }
 
+  if (window.location.pathname === '/management') return <ManagementDashboard />
   if (checkingSession) return <main className="auth-loading" aria-label="Loading your account"><span /></main>
   if (student) return <StudentDashboard student={student} onSignOut={signOutStudent} />
   if (user) return <LearningDashboard user={user} onUserUpdated={updateUser} onSwitchAccount={switchAccount} onSignOut={signOut} />

@@ -164,6 +164,7 @@ export function AuthScreen({ onAuthenticated, onStudentAuthenticated, remembered
             </button>
           </form>
           <p className="auth-privacy">{studentLogin ? 'Your teacher gives you the classroom code and your PIN.' : 'Teacher accounts are private. Student profiles are managed inside your classroom.'}</p>
+          <a className="auth-management-link" href="/management">Open teacher &amp; student management</a>
         </div>
       </section>
     </main>

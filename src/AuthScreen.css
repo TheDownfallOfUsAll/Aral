@@ -13,6 +13,20 @@
   background: #f7f6fc;
 }
 
+.auth-management-link {
+  display: inline-block;
+  margin-top: 14px;
+  color: #7159d2;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.auth-management-link:hover {
+  color: #5240a8;
+  text-decoration: underline;
+}
+
 .auth-loading span {
   width: 34px;
   height: 34px;
