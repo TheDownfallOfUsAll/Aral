@@ -14,12 +14,83 @@ const lessons = [
   { id: 'adding-within-10', title: 'Adding within 10', topic: 'ADDITION', guide: 'Start with the first number. Count forward once for each object in the second group.', workedExample: 'For 4 + 3, count 5, 6, 7 after 4.', question: '4 + 3', choices: [6, 7, 8], answer: 7, explanation: 'Start at 4 and count three steps: 5, 6, 7.' },
   { id: 'subtracting-within-10', title: 'Taking away within 10', topic: 'SUBTRACTION', guide: 'Start with the first number. Count backward once for each object you take away.', workedExample: 'For 9 - 5, count back five steps from 9.', question: '9 - 5', choices: [3, 4, 5], answer: 4, explanation: 'Start at 9 and count back five steps: 8, 7, 6, 5, 4.' },
   { id: 'make-10', title: 'Make 10', topic: 'NUMBER SENSE', guide: 'Look for the number that fills the gap to ten.', workedExample: 'If you have 6, count up to find how many more make 10.', question: '6 + 4', choices: [8, 9, 10], answer: 10, explanation: 'Six needs four more to make ten: 7, 8, 9, 10.' },
+  { id: 'addition-make-ten', title: 'Add by Making Ten', topic: 'ADDITION', guide: 'Break a number apart to make ten first, then add what remains.', workedExample: 'For 8 + 4, make 10 with 2, then add the remaining 2.', question: '8 + 4', choices: [11, 12, 13], answer: 12, explanation: 'Eight needs two more to make ten. Add the remaining two to make twelve.' },
+  { id: 'subtraction-count-back', title: 'Count Back to Subtract', topic: 'SUBTRACTION', guide: 'Count backward one step at a time to find what remains.', workedExample: 'For 9 - 3, count back: 8, 7, 6.', question: '9 - 3', choices: [5, 6, 7], answer: 6, explanation: 'Count back three steps from nine: 8, 7, 6.' },
+  { id: 'equal-groups', title: 'Multiplication: Equal Groups', topic: 'MULTIPLICATION', guide: 'Multiplication is a quick way to count equal groups.', workedExample: 'Three groups with 2 in each are 2 + 2 + 2, or 6.', question: '3 × 2', choices: [5, 6, 7], answer: 6, explanation: 'Three groups of two make 2 + 2 + 2, which is 6.' },
+  { id: 'sharing-equally', title: 'Division: Share Equally', topic: 'DIVISION', guide: 'Division means sharing a group fairly so each share is equal.', workedExample: 'Share 8 counters between 2 friends. Each friend gets 4.', question: '8 ÷ 2', choices: [3, 4, 5], answer: 4, explanation: 'Sharing 8 equally between 2 groups gives 4 in each group.' },
 ]
 const practiceQuestions = [
   { expression: '4 + 3', answer: 7, choices: [6, 7, 8], explanation: 'Start at 4 and count three steps: 5, 6, 7.' },
   { expression: '9 - 5', answer: 4, choices: [3, 4, 5], explanation: 'Start at 9 and count back five steps: 8, 7, 6, 5, 4.' },
   { expression: '6 + 2', answer: 8, choices: [7, 8, 9], explanation: 'Start at 6 and count two steps: 7, 8.' },
   { expression: '10 - 6', answer: 4, choices: [4, 5, 6], explanation: 'Start at 10 and count back six steps: 9, 8, 7, 6, 5, 4.' },
+]
+const quizTopics = [
+  {
+    id: 'addition',
+    title: 'Addition',
+    topic: 'ADD',
+    description: 'Put groups together and add within 10.',
+    questions: [
+      { prompt: '2 + 3 = ?', expression: '2 + 3', choices: [4, 5, 6], answer: 5, explanation: 'Start at 2 and count three more: 3, 4, 5.' },
+      { prompt: '4 + 5 = ?', expression: '4 + 5', choices: [8, 9, 10], answer: 9, explanation: 'Four and five make nine.' },
+      { prompt: '6 + 2 = ?', expression: '6 + 2', choices: [7, 8, 9], answer: 8, explanation: 'Count two more after 6: 7, 8.' },
+      { prompt: '7 + 3 = ?', expression: '7 + 3', choices: [9, 10, 11], answer: 10, explanation: 'Three more than 7 makes 10.' },
+      { prompt: '1 + 8 = ?', expression: '1 + 8', choices: [8, 9, 10], answer: 9, explanation: 'One more than 8 is 9.' },
+    ],
+  },
+  {
+    id: 'subtraction',
+    title: 'Subtraction',
+    topic: 'TAKE AWAY',
+    description: 'Take away and count back to find what remains.',
+    questions: [
+      { prompt: '8 - 3 = ?', expression: '8 - 3', choices: [4, 5, 6], answer: 5, explanation: 'Count back three steps from 8: 7, 6, 5.' },
+      { prompt: '10 - 4 = ?', expression: '10 - 4', choices: [5, 6, 7], answer: 6, explanation: 'Taking four away from ten leaves six.' },
+      { prompt: '7 - 2 = ?', expression: '7 - 2', choices: [4, 5, 6], answer: 5, explanation: 'Count back two steps from 7: 6, 5.' },
+      { prompt: '9 - 6 = ?', expression: '9 - 6', choices: [2, 3, 4], answer: 3, explanation: 'Count back six steps from 9 to land on 3.' },
+      { prompt: '6 - 1 = ?', expression: '6 - 1', choices: [4, 5, 6], answer: 5, explanation: 'One less than 6 is 5.' },
+    ],
+  },
+  {
+    id: 'multiplication',
+    title: 'Multiplication',
+    topic: 'EQUAL GROUPS',
+    description: 'Count equal groups by adding the same number.',
+    questions: [
+      { prompt: '2 groups of 2 = ?', expression: '2 × 2', choices: [2, 4, 6], answer: 4, explanation: 'Two groups of two are 2 + 2, which is 4.' },
+      { prompt: '3 groups of 2 = ?', expression: '3 × 2', choices: [5, 6, 8], answer: 6, explanation: 'Three groups of two are 2 + 2 + 2, which is 6.' },
+      { prompt: '2 groups of 4 = ?', expression: '2 × 4', choices: [6, 8, 10], answer: 8, explanation: 'Two groups of four are 4 + 4, which is 8.' },
+      { prompt: '5 groups of 2 = ?', expression: '5 × 2', choices: [8, 10, 12], answer: 10, explanation: 'Count five groups of two: 2, 4, 6, 8, 10.' },
+      { prompt: '2 groups of 1 = ?', expression: '2 × 1', choices: [1, 2, 3], answer: 2, explanation: 'Two groups with one in each group make 2.' },
+    ],
+  },
+  {
+    id: 'division',
+    title: 'Division',
+    topic: 'FAIR SHARING',
+    description: 'Share a number equally into small groups.',
+    questions: [
+      { prompt: 'Share 4 between 2 friends. Each gets ?', expression: '4 ÷ 2', choices: [1, 2, 3], answer: 2, explanation: 'Four shared equally into two groups gives two in each.' },
+      { prompt: 'Share 6 between 2 friends. Each gets ?', expression: '6 ÷ 2', choices: [2, 3, 4], answer: 3, explanation: 'Six shared equally into two groups gives three in each.' },
+      { prompt: 'Share 8 between 2 friends. Each gets ?', expression: '8 ÷ 2', choices: [3, 4, 5], answer: 4, explanation: 'Eight shared equally into two groups gives four in each.' },
+      { prompt: 'Share 10 between 2 friends. Each gets ?', expression: '10 ÷ 2', choices: [4, 5, 6], answer: 5, explanation: 'Ten shared equally into two groups gives five in each.' },
+      { prompt: 'Share 6 between 3 friends. Each gets ?', expression: '6 ÷ 3', choices: [1, 2, 3], answer: 2, explanation: 'Six shared equally into three groups gives two in each.' },
+    ],
+  },
+  {
+    id: 'number-sense',
+    title: 'Number Sense',
+    topic: 'NUMBER SENSE',
+    description: 'Use number patterns, missing numbers, and mixed review.',
+    questions: [
+      { prompt: 'What number is 1 more than 6?', expression: '6 + 1', choices: [6, 7, 8], answer: 7, explanation: 'One more than 6 is 7.' },
+      { prompt: 'What number makes 5 + ? = 9?', expression: '5 + 4', choices: [3, 4, 5], answer: 4, explanation: 'Five needs four more to make nine.' },
+      { prompt: 'Which number comes right after 8?', expression: '8 + 1', choices: [7, 8, 9], answer: 9, explanation: 'The next number after 8 is 9.' },
+      { prompt: '10 is 2 more than which number?', expression: '8 + 2', choices: [7, 8, 9], answer: 8, explanation: 'Eight plus two makes ten.' },
+      { prompt: 'What is 7 with 2 taken away?', expression: '7 - 2', choices: [4, 5, 6], answer: 5, explanation: 'Count back two from 7: 6, 5.' },
+    ],
+  },
 ]
 
 const json = (response, status, body) => {
@@ -300,6 +371,28 @@ export const handleLearningApi = async (request, response, db, pathname, searchP
   }
 
   const studentMatch = pathname.match(/^\/api\/learning\/students\/(\d+)$/)
+  if (request.method === 'PUT' && studentMatch) {
+    const student = await getOwnedStudent(db, classroom.id, Number(studentMatch[1]))
+    if (!student) return json(response, 404, { error: 'Student not found.' })
+    const input = await readJson(request)
+    if (typeof input.name !== 'string' || input.name.trim().length < 1 || input.name.trim().length > 80) {
+      return json(response, 400, { error: 'Enter a student name (up to 80 characters).' })
+    }
+    const name = input.name.trim()
+    const duplicate = await db.execute({
+      sql: 'SELECT id FROM students WHERE classroom_id = ? AND name = ? COLLATE NOCASE AND id != ?',
+      args: [classroom.id, name, student.id],
+    })
+    if (duplicate.rows[0]) return json(response, 409, { error: 'A student with this name is already in the classroom.' })
+    await db.execute({
+      sql: 'UPDATE students SET name = ? WHERE id = ? AND classroom_id = ?',
+      args: [name, student.id, classroom.id],
+    })
+    return json(response, 200, {
+      student: { id: Number(student.id), name, grade: Number(student.grade) },
+    })
+  }
+
   if (request.method === 'DELETE' && studentMatch) {
     const student = await getOwnedStudent(db, classroom.id, Number(studentMatch[1]))
     if (!student) return json(response, 404, { error: 'Student not found.' })
@@ -629,6 +722,27 @@ export const handleStudentApi = async (request, response, db, pathname) => {
     })
   }
 
+  if (request.method === 'GET' && pathname === '/api/student/quizzes') {
+    return json(response, 200, {
+      topics: quizTopics.map(({ id, title, topic, description, questions }) => ({
+        id, title, topic, description, questionCount: questions.length,
+      })),
+    })
+  }
+
+  const quizTopicMatch = pathname.match(/^\/api\/student\/quizzes\/([a-z-]+)$/)
+  if (request.method === 'GET' && quizTopicMatch) {
+    const quiz = quizTopics.find(({ id }) => id === quizTopicMatch[1])
+    if (!quiz) return json(response, 404, { error: 'Quiz topic not found.' })
+    return json(response, 200, {
+      quiz: {
+        id: quiz.id,
+        title: quiz.title,
+        questions: quiz.questions.map(({ prompt, expression, choices }) => ({ prompt, expression, choices })),
+      },
+    })
+  }
+
   if (request.method === 'GET' && pathname === '/api/student/progress') {
     const [practice, lessonResult, badgeResult] = await Promise.all([
       db.execute({
@@ -657,10 +771,15 @@ export const handleStudentApi = async (request, response, db, pathname) => {
   if (request.method === 'POST' && pathname === '/api/student/practice') {
     const input = await readJson(request)
     const activityId = typeof input.activityId === 'string' ? input.activityId : 'quick-practice'
+    const quizId = activityId.startsWith('quiz:') ? activityId.slice('quiz:'.length) : null
+    const quiz = quizId ? quizTopics.find(({ id }) => id === quizId) : null
     const lesson = activityId === 'quick-practice' ? null : lessons.find(({ id }) => id === activityId)
-    if (activityId !== 'quick-practice' && !lesson) return json(response, 404, { error: 'Lesson not found.' })
-    const questionSet = lesson ? [lesson] : practiceQuestions
-    if (!Array.isArray(input.answers) || input.answers.length !== questionSet.length || input.answers.some((answer) => !Number.isInteger(answer))) {
+    if (activityId !== 'quick-practice' && !lesson && !quiz) return json(response, 404, { error: 'Lesson or quiz not found.' })
+    const questionSet = lesson ? [lesson] : quiz ? quiz.questions : practiceQuestions
+    const durationSeconds = input.durationSeconds ?? 0
+    if (!Array.isArray(input.answers) || input.answers.length !== questionSet.length ||
+      input.answers.some((answer, index) => !Number.isInteger(answer) || !questionSet[index].choices.includes(answer)) ||
+      !Number.isInteger(durationSeconds) || durationSeconds < 0 || durationSeconds > 86_400) {
       return json(response, 400, { error: 'Submit one answer for each practice question.' })
     }
     const correctCount = questionSet.reduce((sum, question, index) => sum + (input.answers[index] === question.answer ? 1 : 0), 0)
@@ -668,7 +787,7 @@ export const handleStudentApi = async (request, response, db, pathname) => {
     await db.execute({
       sql: `INSERT INTO practice_sessions (student_id, activity_id, correct_count, question_count, duration_seconds, created_at)
         VALUES (?, ?, ?, ?, ?, ?)`,
-      args: [student.id, activityId, correctCount, questionSet.length, 0, completedAt],
+      args: [student.id, activityId, correctCount, questionSet.length, durationSeconds, completedAt],
     })
     if (lesson) {
       const prior = await db.execute({
@@ -700,7 +819,7 @@ export const handleStudentApi = async (request, response, db, pathname) => {
       correctCount,
       questionCount: questionSet.length,
       explanations: questionSet.map((question, index) => ({
-        expression: question.question ?? question.expression,
+        expression: question.prompt ?? question.question ?? question.expression,
         selectedAnswer: input.answers[index],
         answer: question.answer,
         correct: input.answers[index] === question.answer,

@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { PhilippinesClock } from './PhilippinesClock'
 import './ManagementDashboard.css'
 
 type Teacher = { id: number; name: string; email: string; createdAt: number }
+type TeacherAccount = Pick<Teacher, 'id' | 'name' | 'email'>
 type Classroom = {
   id: number
   name: string
@@ -9,12 +11,17 @@ type Classroom = {
   createdAt: number
   owner: { id: number; name: string; email: string }
 }
+type LoginClassroom = { id: number; name: string; grade: number; joinCode: string }
 type Student = {
   id: number
   name: string
   grade: number
-  createdAt: number
-  classroom: Classroom
+  sessions: number
+  activitiesThisWeek: number
+  accuracy: number
+  stars: number
+  lessonsCompleted: number
+  classroom: Pick<LoginClassroom, 'id' | 'name'>
 }
 type EntityType = 'teacher' | 'classroom' | 'student'
 type View = 'overview' | EntityType
@@ -23,6 +30,7 @@ type FormValues = {
   name: string
   email: string
   password: string
+  pin: string
   grade: string
   ownerUserId: string
   classroomId: string
@@ -32,15 +40,16 @@ const emptyForm: FormValues = {
   name: '',
   email: '',
   password: '',
+  pin: '',
   grade: '1',
   ownerUserId: '',
   classroomId: '',
 }
 
-async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
+async function requestJson<T>(url: string, init?: RequestInit, service: 'Spring Boot' | 'AralLink' = 'Spring Boot'): Promise<T> {
   let response: Response
   try {
-    response = await fetch(`/spring-api${path}`, {
+    response = await fetch(url, {
       ...init,
       headers: {
         ...(init?.body ? { 'Content-Type': 'application/json' } : {}),
@@ -48,28 +57,49 @@ async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
       },
     })
   } catch {
-    throw new Error('Cannot reach Spring Boot. Start the backend and try again.')
+    throw new Error(`Cannot reach ${service}. Start the server and try again.`)
   }
 
   if (response.status === 204) return undefined as T
   const body: unknown = await response.json().catch(() => null)
   if (!response.ok) {
-    const message = body !== null && typeof body === 'object' && 'message' in body &&
-      typeof body.message === 'string'
-      ? body.message
+    const message = body !== null && typeof body === 'object'
+      ? 'message' in body && typeof body.message === 'string'
+        ? body.message
+        : 'error' in body && typeof body.error === 'string'
+          ? body.error
+          : `Request failed with status ${response.status}.`
       : `Request failed with status ${response.status}.`
     throw new Error(message)
   }
   return body as T
 }
 
+const springApiRequest = <T,>(path: string, init?: RequestInit) =>
+  requestJson<T>(`/spring-api${path}`, init)
+
+const appApiRequest = <T,>(path: string, init?: RequestInit) =>
+  requestJson<T>(path, init, 'AralLink')
+
 async function fetchManagementData() {
-  const [teachers, classrooms, students] = await Promise.all([
-    apiRequest<Teacher[]>('/teachers'),
-    apiRequest<Classroom[]>('/classrooms'),
-    apiRequest<Student[]>('/students'),
+  const { user } = await appApiRequest<{ user: TeacherAccount | null }>('/api/me')
+  if (!user) return { currentTeacher: null, loginClassroom: null, teachers: [], classrooms: [], students: [] }
+
+  const [teachers, classrooms, classroomData] = await Promise.all([
+    springApiRequest<Teacher[]>('/teachers'),
+    springApiRequest<Classroom[]>('/classrooms'),
+    appApiRequest<{ classroom: LoginClassroom; students: Omit<Student, 'classroom'>[] }>('/api/learning/classroom'),
   ])
-  return { teachers, classrooms, students }
+  return {
+    currentTeacher: user,
+    loginClassroom: classroomData.classroom,
+    teachers,
+    classrooms,
+    students: classroomData.students.map((student) => ({
+      ...student,
+      classroom: { id: classroomData.classroom.id, name: classroomData.classroom.name },
+    })),
+  }
 }
 
 function getPhilippinesDateTime(date: Date) {
@@ -89,6 +119,8 @@ export function ManagementDashboard() {
   const [teachers, setTeachers] = useState<Teacher[]>([])
   const [classrooms, setClassrooms] = useState<Classroom[]>([])
   const [students, setStudents] = useState<Student[]>([])
+  const [currentTeacher, setCurrentTeacher] = useState<TeacherAccount | null>(null)
+  const [loginClassroom, setLoginClassroom] = useState<LoginClassroom | null>(null)
   const [activeForm, setActiveForm] = useState<ActiveForm>(null)
   const [formValues, setFormValues] = useState<FormValues>(emptyForm)
   const [now, setNow] = useState(() => new Date())
@@ -103,6 +135,8 @@ export function ManagementDashboard() {
     setError('')
     try {
       const data = await fetchManagementData()
+      setCurrentTeacher(data.currentTeacher)
+      setLoginClassroom(data.loginClassroom)
       setTeachers(data.teachers)
       setClassrooms(data.classrooms)
       setStudents(data.students)
@@ -116,6 +150,8 @@ export function ManagementDashboard() {
   useEffect(() => {
     void fetchManagementData()
       .then((data) => {
+        setCurrentTeacher(data.currentTeacher)
+        setLoginClassroom(data.loginClassroom)
         setTeachers(data.teachers)
         setClassrooms(data.classrooms)
         setStudents(data.students)
@@ -142,7 +178,6 @@ export function ManagementDashboard() {
       setFormValues({
         ...emptyForm,
         ownerUserId: type === 'classroom' ? String(teachers[0]?.id ?? '') : '',
-        classroomId: type === 'student' ? String(classrooms[0]?.id ?? '') : '',
       })
       return
     }
@@ -162,8 +197,6 @@ export function ManagementDashboard() {
       setFormValues({
         ...emptyForm,
         name: student.name,
-        grade: String(student.grade),
-        classroomId: String(student.classroom.id),
       })
     }
   }
@@ -195,20 +228,52 @@ export function ManagementDashboard() {
         ownerUserId: Number(formValues.ownerUserId),
       }
     } else {
-      body = {
-        name: formValues.name.trim(),
-        grade: Number(formValues.grade),
-        classroomId: Number(formValues.classroomId),
+      if ((!id && !/^\d{4,8}$/.test(formValues.pin)) || (id && formValues.pin && !/^\d{4,8}$/.test(formValues.pin))) {
+        setError('Student PIN must contain 4 to 8 digits.')
+        setSaving(false)
+        return
       }
+      body = { name: formValues.name.trim() }
     }
 
     try {
-      await apiRequest(path, {
-        method: id ? 'PUT' : 'POST',
-        body: JSON.stringify(body),
-      })
+      if (type === 'student') {
+        if (!id) {
+          await appApiRequest('/api/learning/students', {
+            method: 'POST',
+            body: JSON.stringify({ ...body, pin: formValues.pin }),
+          })
+        } else {
+          await appApiRequest(`/api/learning/students/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(body),
+          })
+          if (formValues.pin) {
+            try {
+              await appApiRequest(`/api/learning/students/${id}/pin`, {
+                method: 'PUT',
+                body: JSON.stringify({ pin: formValues.pin }),
+              })
+            } catch (pinError) {
+              throw new Error(`Student name was saved, but the PIN could not be reset: ${pinError instanceof Error ? pinError.message : 'Please try again.'}`)
+            }
+          }
+        }
+      } else {
+        await springApiRequest(path, {
+          method: id ? 'PUT' : 'POST',
+          body: JSON.stringify(body),
+        })
+      }
       setActiveForm(null)
-      setNotice(`${type[0].toUpperCase()}${type.slice(1)} ${id ? 'updated' : 'created'} successfully.`)
+      if (type === 'student' && !id && loginClassroom) {
+        setNotice(`Student login created. Sign in with classroom code ${loginClassroom.joinCode}, name ${formValues.name.trim()}, and PIN ${formValues.pin}. Save these details; the PIN cannot be viewed again.`)
+      } else if (type === 'student' && id && formValues.pin && loginClassroom) {
+        setNotice(`Student updated. Sign in with classroom code ${loginClassroom.joinCode}, name ${formValues.name.trim()}, and the new PIN. Save the new PIN; it cannot be viewed again.`)
+      } else {
+        setNotice(`${type[0].toUpperCase()}${type.slice(1)} ${id ? 'updated' : 'created'} successfully.`)
+      }
+      setFormValues(emptyForm)
       await loadData()
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : 'Could not save this record.')
@@ -225,7 +290,12 @@ export function ManagementDashboard() {
     setError('')
     setNotice('')
     try {
-      await apiRequest(`/${type === 'teacher' ? 'teachers' : `${type}s`}/${id}`, { method: 'DELETE' })
+      const path = `/${type === 'teacher' ? 'teachers' : `${type}s`}/${id}`
+      if (type === 'student') {
+        await appApiRequest(`/api/learning/students/${id}`, { method: 'DELETE' })
+      } else {
+        await springApiRequest(path, { method: 'DELETE' })
+      }
       setNotice(`${type[0].toUpperCase()}${type.slice(1)} deleted.`)
       await loadData()
     } catch (deleteError) {
@@ -237,6 +307,21 @@ export function ManagementDashboard() {
   const formTitle = activeForm
     ? `${activeForm.id ? 'Edit' : 'Add'} ${activeForm.type}`
     : ''
+
+  if (!loading && !currentTeacher) {
+    return (
+      <main className="management-app">
+        <section className="management-access-gate">
+          <span className="management-brand-mark" aria-hidden="true">∑</span>
+          <span className="management-eyebrow">TEACHER ACCESS</span>
+          <h1>Sign in to manage your students.</h1>
+          <p>Student accounts belong to a teacher’s classroom. Sign in as a teacher first so new students can use their classroom code and PIN to log in.</p>
+          {error && <div className="management-alert error" role="alert">{error}</div>}
+          <a className="management-primary" href="/">Go to teacher sign in <span aria-hidden="true">→</span></a>
+        </section>
+      </main>
+    )
+  }
 
   return (
     <main className="management-app">
@@ -278,10 +363,7 @@ export function ManagementDashboard() {
       <section className="management-main">
         <header className="management-topbar">
           <div><span>AralLink</span><b aria-hidden="true">/</b><strong>{view === 'overview' ? 'Overview' : `${view[0].toUpperCase()}${view.slice(1)}s`}</strong></div>
-          <div className="management-top-clock" aria-label={`Philippines time: ${currentDateTime.dateText}, ${currentDateTime.timeText}`}>
-            <span aria-hidden="true">◷</span>
-            <span><b>{currentDateTime.timeText}</b><small>Philippines time · PHT</small></span>
-          </div>
+          <PhilippinesClock now={now} compact className="management-clock-widget" />
         </header>
 
         <div className="management-content">
@@ -320,6 +402,8 @@ export function ManagementDashboard() {
                 </div>
               </section>
 
+              {loginClassroom && <ClassroomAccessCard classroom={loginClassroom} />}
+
               <section className="management-stat-grid" aria-label="Classroom totals">
                 <article className="management-stat-card teacher-stat"><span className="management-stat-icon">♙</span><small>TEACHERS</small><strong>{loading ? '—' : teachers.length}</strong><p>Classroom guides</p></article>
                 <article className="management-stat-card classroom-stat"><span className="management-stat-icon">▤</span><small>CLASSROOMS</small><strong>{loading ? '—' : classrooms.length}</strong><p>Learning spaces</p></article>
@@ -342,6 +426,7 @@ export function ManagementDashboard() {
               </div>
               {view === 'teacher' && <TeacherTable teachers={teachers} loading={loading} onEdit={(teacher) => openForm('teacher', teacher)} onDelete={(teacher) => void deleteRecord('teacher', teacher.id, teacher.name)} />}
               {view === 'classroom' && <ClassroomTable classrooms={classrooms} loading={loading} onEdit={(classroom) => openForm('classroom', classroom)} onDelete={(classroom) => void deleteRecord('classroom', classroom.id, classroom.name)} />}
+              {view === 'student' && loginClassroom && <ClassroomAccessCard classroom={loginClassroom} />}
               {view === 'student' && <StudentTable students={students} loading={loading} onEdit={(student) => openForm('student', student)} onDelete={(student) => void deleteRecord('student', student.id, student.name)} />}
             </section>
           )}
@@ -379,23 +464,58 @@ export function ManagementDashboard() {
                 <label><span>Email address</span><input type="email" autoComplete="email" required maxLength={254} value={formValues.email} onChange={(event) => setFormValues({ ...formValues, email: event.target.value })} placeholder="teacher@example.com" /></label>
                 <label><span>Password {activeForm.id ? '(leave blank to keep current)' : ''}</span><input type="password" autoComplete={activeForm.id ? 'new-password' : 'new-password'} minLength={8} required={!activeForm.id} value={formValues.password} onChange={(event) => setFormValues({ ...formValues, password: event.target.value })} placeholder="At least 8 characters" /></label>
               </>}
-              {activeForm.type !== 'teacher' && <>
+              {activeForm.type === 'student' && loginClassroom && <>
+                <label><span>Student sign-in PIN {activeForm.id ? '(leave blank to keep current)' : '(4 to 8 digits)'}</span><input type="password" autoComplete="new-password" inputMode="numeric" minLength={activeForm.id && !formValues.pin ? undefined : 4} maxLength={8} required={!activeForm.id} value={formValues.pin} onChange={(event) => setFormValues({ ...formValues, pin: event.target.value.replace(/\D/g, '').slice(0, 8) })} placeholder={activeForm.id ? 'Optional PIN reset' : 'Create a 4 to 8 digit PIN'} /></label>
+                <div className="management-classroom-note">This student will sign in to <b>{loginClassroom.name}</b> with classroom code <b>{loginClassroom.joinCode}</b>.</div>
+              </>}
+              {activeForm.type === 'classroom' && <>
                 <label><span>Grade</span><select required value={formValues.grade} onChange={(event) => setFormValues({ ...formValues, grade: event.target.value })}><option value="1">Grade 1</option><option value="2">Grade 2</option><option value="3">Grade 3</option><option value="4">Grade 4</option><option value="5">Grade 5</option><option value="6">Grade 6</option></select></label>
-                {activeForm.type === 'classroom' ? (
+                {(
                   <label><span>Teacher</span><select required value={formValues.ownerUserId} onChange={(event) => setFormValues({ ...formValues, ownerUserId: event.target.value })}><option value="">Select a teacher</option>{teachers.map((teacher) => <option key={teacher.id} value={teacher.id}>{teacher.name} · {teacher.email}</option>)}</select>{teachers.length === 0 && <small className="management-field-hint">Add a teacher first, then assign them to a classroom.</small>}</label>
-                ) : (
-                  <label><span>Classroom</span><select required value={formValues.classroomId} onChange={(event) => setFormValues({ ...formValues, classroomId: event.target.value })}><option value="">Select a classroom</option>{classrooms.map((classroom) => <option key={classroom.id} value={classroom.id}>{classroom.name} · Grade {classroom.grade}</option>)}</select>{classrooms.length === 0 && <small className="management-field-hint">Create a classroom first, then add a student.</small>}</label>
                 )}
               </>}
               {error && <p className="management-alert error" role="alert">{error}</p>}
               <div className="management-form-actions">
                 <button className="management-secondary" type="button" onClick={() => dialogRef.current?.close()}>Cancel</button>
-                <button className="management-primary" type="submit" disabled={saving || (activeForm.type === 'classroom' ? teachers.length === 0 : activeForm.type === 'student' ? classrooms.length === 0 : false)}>{saving ? 'Saving…' : activeForm.id ? 'Save changes' : `Create ${activeForm.type}`}</button>
+                <button className="management-primary" type="submit" disabled={saving || (activeForm.type === 'classroom' && teachers.length === 0) || (activeForm.type === 'student' && !loginClassroom)}>{saving ? 'Saving…' : activeForm.id ? 'Save changes' : `Create ${activeForm.type}`}</button>
               </div>
             </form>
         </dialog>
       )}
     </main>
+  )
+}
+
+function ClassroomAccessCard({ classroom }: { classroom: LoginClassroom }) {
+  const [copied, setCopied] = useState(false)
+  const [copyError, setCopyError] = useState('')
+
+  const copyJoinCode = async () => {
+    setCopyError('')
+    try {
+      await navigator.clipboard.writeText(classroom.joinCode)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 1800)
+    } catch {
+      setCopyError('Could not copy the code. You can select and copy it manually.')
+    }
+  }
+
+  return (
+    <section className="management-classroom-access" aria-label="Student login details">
+      <span className="management-classroom-access-icon" aria-hidden="true">⌂</span>
+      <div>
+        <span className="management-eyebrow">STUDENT SIGN-IN CLASSROOM</span>
+        <strong>{classroom.name} · Grade {classroom.grade}</strong>
+        <small>Students use this code, their name, and teacher-issued PIN to sign in.</small>
+      </div>
+      <div className="management-join-code">
+        <span>CLASSROOM CODE</span>
+        <b>{classroom.joinCode}</b>
+      </div>
+      <button className="management-secondary" type="button" onClick={() => void copyJoinCode}>{copied ? 'Copied' : 'Copy code'}</button>
+      {copyError && <small className="management-copy-error" role="status">{copyError}</small>}
+    </section>
   )
 }
 

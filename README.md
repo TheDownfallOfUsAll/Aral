@@ -1,6 +1,6 @@
 # AralLink for Numbers
 
-AralLink for Numbers is a desktop-first learning app for Grade 1 addition and subtraction. Teachers can create a classroom and student profiles, then follow lesson progress, practice results, stars, badges, and notifications. Student sign-in is available for classroom practice.
+AralLink for Numbers is a desktop-first Grade 1 math learning app. Its seven lessons introduce addition, subtraction, number sense, equal groups, and fair sharing. Students can also take five-question quizzes on addition, subtraction, multiplication, division, and number sense. Teachers can create a classroom and student profiles, then follow lesson progress, practice results, stars, badges, and notifications.
 
 This project is currently scoped to Increment 1. Prototype and classroom data are kept locally when using the local development setup; no mobile screens or mobile application are included.
 
@@ -103,7 +103,8 @@ Redeploy after configuring the variables. The API returns a clear `503` response
 
 ## Increment 1 scope
 
-- Grade 1 addition and subtraction practice within 10
+- Seven student lessons covering addition and subtraction within 10, number sense, equal groups, and fair sharing
+- Five-question student quizzes for addition, subtraction, multiplication, division, and number sense
 - Student lessons, progress, stars, badges, and completion views
 - Teacher classroom roster and progress overview
 - Classroom notifications for teachers and guardians
@@ -117,6 +118,7 @@ Teacher learning routes require the HTTP-only `aral_session` cookie. Each teache
 |---|---|
 | `GET /api/learning/classroom` | Classroom and roster, including weekly activity, accuracy, stars, and completed lesson counts. |
 | `POST /api/learning/students` | Create a student with `{ "name": "...", "pin": "1234" }`. |
+| `PUT /api/learning/students/:id` | Rename a student in the signed-in teacher's classroom. |
 | `PUT /api/learning/students/:id/pin` | Reset a student's PIN and revoke that student's active sessions. |
 | `DELETE /api/learning/students/:id` | Remove a student from the classroom. |
 | `GET /api/learning/classroom/guides` | Get teacher guides and answer keys. |
@@ -127,21 +129,25 @@ Teacher learning routes require the HTTP-only `aral_session` cookie. Each teache
 | `GET /api/learning/notifications` | List classroom notifications. |
 | `PATCH /api/learning/notifications/read` | Mark notifications as read. |
 
-<<<<<<< HEAD
-Student sign-in uses `POST /api/student/login` with `{ "joinCode": "CLASSCODE", "name": "...", "pin": "1234" }`. Student sessions use a separate HTTP-only cookie from teacher sessions. `/api/student/lessons` and `/api/student/classroom/guides` omit answer keys; `POST /api/student/practice` and teacher practice submissions are graded on the server and return worked explanations after submission.
+Student sign-in uses `POST /api/student/login` with `{ "joinCode": "CLASSCODE", "name": "...", "pin": "1234" }`. Student sessions use a separate HTTP-only cookie from teacher sessions. `/api/student/lessons`, `/api/student/classroom/guides`, and the quiz endpoints omit answer keys. `GET /api/student/quizzes` lists topics, while `GET /api/student/quizzes/:topicId` returns a topic's questions and choices. Submit a quiz through `POST /api/student/practice` with an `activityId` such as `quiz:addition`, one selected choice per question, and an optional `durationSeconds`. Student practice and teacher practice submissions are graded on the server and return worked explanations after submission.
 
 ## Spring Boot classroom management
 
-The separate Spring Boot backend provides a desktop management page for
-teachers, classrooms, and students. Start the backend from the `backend`
-directory, then start the frontend with `npm run dev`. Open
-`http://localhost:5173/management`, or choose **Open teacher & student
-management** from the sign-in page.
+The desktop management page at `http://localhost:5173/management` requires a
+signed-in teacher account. Open it from the teacher dashboard or the sign-in
+page; if you are signed out, follow the sign-in link and return to management.
+The teacher and management overviews show the current date and digital and
+analog time in the `Asia/Manila` time zone.
 
-The overview shows the live date and time in the `Asia/Manila` time zone. Use
-the Teachers, Classrooms, and Students sections to create, view, update, and
-delete records. Add a teacher first, create a classroom and assign its teacher,
-then create students and assign them to a classroom.
+The Students section manages real AralLink student logins through the
+authenticated Node learning API. Create a student with a 4–8 digit PIN, then
+share the displayed classroom code, the student's name, and PIN for sign-in.
+You can rename a student or reset their PIN; the PIN is stored as a hash and
+cannot be viewed later. These students appear in the teacher's classroom roster.
+
+The Teachers and Classrooms sections are the separate Spring Boot CRUD
+coursework API. Those records use the Spring Boot SQLite database and are not
+AralLink sign-in accounts or the login classroom used by the student roster.
 
 During Vite development, `/spring-api` is proxied to the Spring Boot API at
 `http://127.0.0.1:8081` by default, keeping the existing Node `/api` routes
@@ -153,10 +159,6 @@ $env:VITE_SPRING_API_TARGET = "http://127.0.0.1:8080"
 npm run dev
 ```
 
-The management screen requires both servers to be running. This Vite proxy
-configuration is for local development and preview; the existing production
-Node server does not automatically proxy requests to Spring Boot.
-=======
 Five saved practice sessions award the Number Explorer badge.
 
 Student sign-in uses `POST /api/student/login` with `{ "joinCode": "CLASSCODE", "name": "...", "pin": "1234" }`. Other student routes are under `/api/student/`.
@@ -165,5 +167,4 @@ Student sign-in uses `POST /api/student/login` with `{ "joinCode": "CLASSCODE", 
 
 Teacher passwords are stored as scrypt hashes. Session tokens are random, expiring values stored as hashes in SQLite and sent in HTTP-only, same-site cookies. Names and email addresses entered for accounts are stored in the database. Use test data for local development and protect database backups and deployment credentials.
 
-The standalone Spring Boot coursework API in [`backend/README.md`](backend/README.md) is a separate application and database. `npm run dev` does not start it or route the frontend to it.
->>>>>>> 6db5e299fa933e3bee620dc24d1081ab9a5686b3
+The standalone Spring Boot coursework API in [`backend/README.md`](backend/README.md) uses a separate database. `npm run dev` starts the Node API and frontend; start Spring Boot separately. The management page loads both APIs, so both servers must be running. The Vite proxy is for local development and preview; the production Node server does not automatically proxy requests to Spring Boot.

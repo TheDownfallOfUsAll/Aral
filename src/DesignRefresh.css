@@ -1,0 +1,454 @@
+:root {
+  --font-body: 'Nunito Sans', sans-serif;
+  --font-display: 'Outfit', sans-serif;
+  --brand-green: #287c68;
+  --brand-green-dark: #205e50;
+  --brand-green-soft: #e8f3e9;
+  --brand-gold: #e7ad4d;
+  --surface-canvas: #f3f7f1;
+  --surface-paper: #fffefa;
+  --text-strong: #243b33;
+  --text-muted: #75867d;
+  font-family: var(--font-body);
+}
+
+body {
+  background: var(--surface-canvas);
+  color: var(--text-strong);
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+.brand-copy b,
+.auth-brand,
+.auth-mobile-brand,
+.management-brand b,
+.management-access-gate h1,
+.management-overview-banner h2,
+.management-dialog-heading h2 {
+  font-family: var(--font-display);
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: var(--font-body);
+}
+
+button:not(:disabled) {
+  transition:
+    transform .2s cubic-bezier(.2, .75, .25, 1),
+    box-shadow .2s ease,
+    border-color .2s ease,
+    background-color .2s ease,
+    color .2s ease;
+}
+
+button:not(:disabled):active {
+  transform: translateY(1px) scale(.985);
+}
+
+:focus-visible {
+  outline: 3px solid rgb(40 124 104 / 38%);
+  outline-offset: 3px;
+}
+
+.auth-page {
+  background: var(--surface-paper);
+  font-family: var(--font-body);
+}
+
+.auth-showcase {
+  background-color: #e5f1e5;
+  background-image:
+    radial-gradient(ellipse at 16% 12%, rgb(255 255 255 / 75%), transparent 29rem),
+    repeating-linear-gradient(0deg, transparent 0 43px, rgb(49 111 85 / 4%) 44px),
+    repeating-linear-gradient(90deg, transparent 0 43px, rgb(49 111 85 / 4%) 44px),
+    linear-gradient(135deg, #dcefe3, #edf2df 56%, #e8f1eb);
+}
+
+.auth-form-side {
+  background:
+    radial-gradient(ellipse at 80% 10%, rgb(232 243 234 / 62%), transparent 27rem),
+    #fffefa;
+}
+
+.auth-submit,
+.primary-button,
+.hero-button,
+.management-app .management-primary {
+  border: 0;
+  background: linear-gradient(135deg, #368f72, #246b59);
+  box-shadow: 0 8px 18px rgb(38 114 91 / 22%);
+  color: #fff;
+}
+
+.auth-management-link {
+  color: var(--brand-green);
+}
+
+.auth-management-link:hover {
+  color: var(--brand-green-dark);
+}
+
+.auth-submit:not(:disabled):hover,
+.primary-button:not(:disabled):hover,
+.hero-button:not(:disabled):hover,
+.management-app .management-primary:not(:disabled):hover {
+  background: linear-gradient(135deg, #2d8068, #1d5e4f);
+  box-shadow: 0 11px 25px rgb(38 114 91 / 32%), 0 0 18px rgb(64 157 119 / 22%);
+  transform: translateY(-2px);
+}
+
+.primary-button:disabled,
+.management-app .management-primary:disabled {
+  box-shadow: none;
+}
+
+.app-shell {
+  background-color: var(--surface-canvas);
+  background-image:
+    radial-gradient(ellipse at 84% 3%, rgb(224 242 228 / 50%), transparent 31rem),
+    linear-gradient(135deg, #f8f8f0, #f0f6f1 56%, #eff3f2);
+}
+
+.sidebar {
+  background: rgb(255 255 252 / 93%);
+  border-right-color: #dce8df;
+  box-shadow: 8px 0 28px rgb(42 81 65 / 6%);
+}
+
+.topbar {
+  background: rgb(255 255 252 / 88%);
+  backdrop-filter: blur(18px);
+}
+
+.brand-mark,
+.auth-brand-mark {
+  background: linear-gradient(145deg, #3c987a, #236b59);
+  box-shadow: 0 8px 19px rgb(38 114 91 / 25%);
+}
+
+.brand-copy b,
+.welcome-row h1,
+.page-heading h1,
+.section-heading h2,
+.side-section-title h2 {
+  color: var(--text-strong);
+}
+
+.hero-banner {
+  border: 1px solid #c9dfd0;
+  box-shadow: 0 16px 38px rgb(52 99 75 / 10%);
+}
+
+.stat-card,
+.lesson-card,
+.lesson-row,
+.student-guide,
+.teacher-guide,
+.progress-metric,
+.progress-highlight,
+.settings-card,
+.settings-signout,
+.notification-item,
+.management-stat-card,
+.management-classroom-access {
+  box-shadow: 0 8px 24px rgb(42 81 65 / 6%);
+}
+
+.stat-card,
+.lesson-card,
+.student-guide,
+.teacher-guide,
+.management-stat-card {
+  transition: transform .24s cubic-bezier(.2, .75, .25, 1), box-shadow .24s ease, border-color .24s ease;
+}
+
+.stat-card:hover,
+.lesson-card:hover:not(.is-locked),
+.student-guide:hover:not(.is-locked),
+.teacher-guide:hover,
+.management-stat-card:hover {
+  border-color: #bfd9c8;
+  box-shadow: 0 15px 32px rgb(42 81 65 / 12%);
+  transform: translateY(-4px);
+}
+
+.lesson-card.is-locked,
+.student-guide.is-locked {
+  filter: saturate(.72);
+}
+
+.nav-item.active,
+.settings-link.active {
+  background: linear-gradient(100deg, #e1f1e6, #edf5e9);
+  color: var(--brand-green);
+}
+
+.nav-item.active {
+  box-shadow: inset 3px 0 #348a6c;
+}
+
+.soft-button,
+.outline-button,
+.account-logout,
+.settings-switch-button {
+  border-color: #d5e4d9;
+  background-color: #fffefa;
+}
+
+.soft-button:hover:not(:disabled),
+.outline-button:hover:not(:disabled),
+.account-logout:hover,
+.settings-switch-button:hover {
+  border-color: #a9cdb7;
+  background: #edf6ee;
+  color: var(--brand-green-dark);
+}
+
+.answer-choice {
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+}
+
+.answer-choice:hover:not(:disabled) {
+  box-shadow: 0 9px 20px rgb(42 81 65 / 10%);
+  transform: translateY(-3px);
+}
+
+.answer-choice.selected {
+  border-color: #6fae8b;
+  background: #edf7ed;
+  box-shadow: 0 0 0 4px rgb(66 135 101 / 11%);
+}
+
+.progress-track {
+  overflow: hidden;
+  border-radius: 999px;
+}
+
+.progress-track span {
+  background: linear-gradient(90deg, #9bc994, #328b70);
+  transition: width .6s cubic-bezier(.2, .75, .25, 1);
+}
+
+.management-app {
+  background: #f3f7f1;
+  color: var(--text-strong);
+  font-family: var(--font-body);
+}
+
+.management-sidebar {
+  background: rgb(255 255 252 / 94%);
+  box-shadow: 8px 0 28px rgb(42 81 65 / 5%);
+}
+
+.management-brand-mark {
+  background: linear-gradient(145deg, #3c987a, #236b59);
+  box-shadow: 0 8px 19px rgb(38 114 91 / 24%);
+}
+
+.management-brand b span,
+.management-back-link:hover,
+.management-text-button,
+.management-refresh,
+.management-row-actions button {
+  color: var(--brand-green);
+}
+
+.management-text-button:hover,
+.management-row-actions button:hover {
+  color: var(--brand-green-dark);
+}
+
+.management-row-actions button:hover {
+  border-color: #b7d5c2;
+  background: #edf6ee;
+}
+
+.management-empty > span,
+.management-empty b {
+  color: var(--brand-green);
+}
+
+.management-person-avatar:not(.classroom-avatar) {
+  background: #e3f1e8;
+  color: var(--brand-green);
+}
+
+.management-nav-item:hover,
+.management-nav-item.active {
+  background: linear-gradient(100deg, #e1f1e6, #edf5e9);
+  color: var(--brand-green);
+}
+
+.management-nav-item.active > span,
+.management-nav-item:hover > span {
+  color: var(--brand-green);
+}
+
+.management-primary {
+  animation: ui-button-glow 3.6s ease-in-out infinite;
+}
+
+.management-primary:not(:disabled):hover {
+  animation: none;
+}
+
+.management-overview-banner {
+  border: 1px solid #cde2d1;
+  background: linear-gradient(115deg, #e7f3e8, #f3f2e2 65%, #e7f1e9);
+  box-shadow: 0 15px 35px rgb(52 99 75 / 9%);
+}
+
+.management-banner-kicker,
+.management-overview-banner h2 em {
+  color: var(--brand-green);
+}
+
+.management-access-gate .management-brand-mark {
+  color: #fff;
+}
+
+.management-app button:focus-visible,
+.management-app input:focus-visible,
+.management-app select:focus-visible,
+.management-app a:focus-visible,
+.auth-form input:focus-visible,
+.auth-form button:focus-visible,
+.auth-page a:focus-visible,
+.auth-tabs button:focus-visible,
+.auth-account-switch:focus-visible {
+  outline-color: rgb(40 124 104 / 42%);
+}
+
+.auth-submit:not(:disabled),
+.primary-button:not(:disabled),
+.hero-button:not(:disabled),
+.management-app .management-primary:not(:disabled) {
+  animation: ui-button-glow 3.6s ease-in-out infinite;
+}
+
+.auth-submit:not(:disabled):hover,
+.primary-button:not(:disabled):hover,
+.hero-button:not(:disabled):hover,
+.management-app .management-primary:not(:disabled):hover {
+  animation: none;
+}
+
+@keyframes ui-button-glow {
+  0%, 100% {
+    box-shadow: 0 7px 17px rgb(38 114 91 / 20%), 0 0 0 0 rgb(64 157 119 / 0%);
+  }
+
+  50% {
+    box-shadow: 0 9px 22px rgb(38 114 91 / 25%), 0 0 18px 2px rgb(64 157 119 / 17%);
+  }
+}
+
+@keyframes ui-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ui-float {
+  0%, 100% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: 0 -7px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .page-content > * {
+    animation: ui-rise-in .48s cubic-bezier(.2, .75, .25, 1) both;
+  }
+
+  .page-content > *:nth-child(2) {
+    animation-delay: 70ms;
+  }
+
+  .page-content > *:nth-child(3) {
+    animation-delay: 130ms;
+  }
+
+  .page-content > *:nth-child(4) {
+    animation-delay: 190ms;
+  }
+
+  .stat-card,
+  .lesson-card,
+  .student-guide,
+  .teacher-guide,
+  .management-stat-card,
+  .management-classroom-access {
+    animation: ui-rise-in .5s cubic-bezier(.2, .75, .25, 1) both;
+  }
+
+  .stat-card:nth-child(2),
+  .lesson-card:nth-child(2),
+  .student-guide:nth-child(2),
+  .teacher-guide:nth-child(2) {
+    animation-delay: 90ms;
+  }
+
+  .stat-card:nth-child(3),
+  .lesson-card:nth-child(3) {
+    animation-delay: 170ms;
+  }
+
+  .hero-illustration {
+    animation: ui-float 5s ease-in-out infinite;
+  }
+}
+
+@media (max-width: 900px) {
+  .management-app .management-classroom-access {
+    gap: 12px;
+  }
+
+  .management-app .management-content {
+    padding-right: 22px;
+    padding-left: 22px;
+  }
+}
+
+@media (max-width: 650px) {
+  .auth-form-wrap {
+    box-shadow: 0 17px 42px rgb(42 81 65 / 8%);
+  }
+
+  .management-app .management-content {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+
+  .management-app .management-topbar {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

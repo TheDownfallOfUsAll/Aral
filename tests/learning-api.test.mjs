@@ -165,6 +165,31 @@ describe('learning API', () => {
     }
   })
 
+  it('updates a student login name within the owning teacher classroom', async () => {
+    const { database, db } = await createHarness()
+    try {
+      const added = await callApi(db, 1, 'POST', '/api/learning/students', { name: 'Sam Lee', pin: '5482' })
+      const studentId = added.body.student.id
+      const renamed = await callApi(db, 1, 'PUT', `/api/learning/students/${studentId}`, { name: 'Sam Rivera' })
+      assert.equal(renamed.statusCode, 200)
+      assert.deepEqual(renamed.body.student, { id: studentId, name: 'Sam Rivera', grade: 1 })
+
+      const classroom = await callApi(db, 1, 'GET', '/api/learning/classroom')
+      const joinCode = classroom.body.classroom.joinCode
+      assert.equal((await callStudentLogin(db, { joinCode, name: 'Sam Lee', pin: '5482' })).statusCode, 401)
+      assert.equal((await callStudentLogin(db, { joinCode, name: 'Sam Rivera', pin: '5482' })).statusCode, 200)
+
+      const duplicate = await callApi(db, 1, 'POST', '/api/learning/students', { name: 'Another Student', pin: '1937' })
+      const duplicateName = await callApi(db, 1, 'PUT', `/api/learning/students/${duplicate.body.student.id}`, { name: 'Sam Rivera' })
+      assert.equal(duplicateName.statusCode, 409)
+
+      const otherTeacher = await callApi(db, 2, 'PUT', `/api/learning/students/${studentId}`, { name: 'Unauthorized Rename' })
+      assert.equal(otherTeacher.statusCode, 404)
+    } finally {
+      database.close()
+    }
+  })
+
   it('starts a new classroom and student at lesson one with zero saved progress', async () => {
     const { database, db } = await createHarness()
     try {
@@ -175,7 +200,7 @@ describe('learning API', () => {
       const added = await callApi(db, 2, 'POST', '/api/learning/students', { name: 'Avery Reed', pin: '2846' })
       const studentId = added.body.student.id
       const initialLessons = await callApi(db, 2, 'GET', `/api/learning/lessons?studentId=${studentId}`)
-      assert.deepEqual(initialLessons.body.lessons.map(({ progress }) => progress), [0, 0, 0])
+      assert.deepEqual(initialLessons.body.lessons.map(({ progress }) => progress), [0, 0, 0, 0, 0, 0, 0])
 
       const initialProgress = await callApi(db, 2, 'GET', `/api/learning/progress?studentId=${studentId}`)
       assert.equal(initialProgress.body.sessions, 0)
@@ -234,6 +259,72 @@ describe('learning API', () => {
       assert.equal(loggedOut.statusCode, 200)
       const expiredSession = await callStudentApi(db, 'GET', '/api/student/me', reloginCookie)
       assert.equal(expiredSession.statusCode, 401)
+    } finally {
+      database.close()
+    }
+  })
+
+  it('serves five answer-safe quiz topics and saves validated quiz scores', async () => {
+    const { database, db } = await createHarness()
+    try {
+      const added = await callApi(db, 1, 'POST', '/api/learning/students', { name: 'Taylor Kim', pin: '7316' })
+      const classroom = await callApi(db, 1, 'GET', '/api/learning/classroom')
+      const login = await callStudentLogin(db, {
+        joinCode: classroom.body.classroom.joinCode,
+        name: 'Taylor Kim',
+        pin: '7316',
+      })
+      const cookie = login.headers['Set-Cookie'].split(';')[0]
+
+      const lessons = await callStudentApi(db, 'GET', '/api/student/lessons', cookie)
+      assert.equal(lessons.body.lessons.length, 7)
+      const makeTenLesson = lessons.body.lessons.find(({ id }) => id === 'addition-make-ten')
+      assert.deepEqual(makeTenLesson.choices, [11, 12, 13])
+      assert.equal(makeTenLesson.question, '8 + 4')
+      assert.equal(Object.hasOwn(makeTenLesson, 'answer'), false)
+
+      const topics = await callStudentApi(db, 'GET', '/api/student/quizzes', cookie)
+      assert.equal(topics.statusCode, 200)
+      assert.deepEqual(topics.body.topics.map(({ id }) => id), [
+        'addition', 'subtraction', 'multiplication', 'division', 'number-sense',
+      ])
+      assert.ok(topics.body.topics.every(({ questionCount }) => questionCount === 5))
+
+      for (const { id } of topics.body.topics) {
+        const quiz = await callStudentApi(db, 'GET', `/api/student/quizzes/${id}`, cookie)
+        assert.equal(quiz.statusCode, 200)
+        assert.equal(quiz.body.quiz.questions.length, 5)
+        assert.ok(quiz.body.quiz.questions.every((question) => !Object.hasOwn(question, 'answer')))
+      }
+
+      const invalid = await callStudentApi(db, 'POST', '/api/student/practice', cookie, {
+        activityId: 'quiz:addition',
+        answers: [99, 9, 8, 10, 9],
+      })
+      assert.equal(invalid.statusCode, 400)
+
+      const submitted = await callStudentApi(db, 'POST', '/api/student/practice', cookie, {
+        activityId: 'quiz:addition',
+        answers: [4, 9, 8, 10, 9],
+        durationSeconds: 42,
+      })
+      assert.equal(submitted.statusCode, 201)
+      assert.equal(submitted.body.correctCount, 4)
+      assert.equal(submitted.body.questionCount, 5)
+      assert.equal(submitted.body.explanations[0].correct, false)
+      assert.equal(submitted.body.explanations[0].expression, '2 + 3 = ?')
+      assert.equal(submitted.body.explanations[0].answer, 5)
+
+      const progress = await callStudentApi(db, 'GET', '/api/student/progress', cookie)
+      assert.equal(progress.body.sessions, 1)
+      assert.equal(progress.body.correct, 4)
+      assert.equal(progress.body.questions, 5)
+      assert.equal(progress.body.accuracy, 80)
+
+      const session = database.prepare('SELECT activity_id, duration_seconds FROM practice_sessions WHERE student_id = ?')
+        .get(added.body.student.id)
+      assert.equal(session.activity_id, 'quiz:addition')
+      assert.equal(session.duration_seconds, 42)
     } finally {
       database.close()
     }

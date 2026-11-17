@@ -1,0 +1,175 @@
+.philippines-clock {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 17px;
+  border: 1px solid #dce9df;
+  border-radius: 16px;
+  background: rgb(255 255 252 / 92%);
+  box-shadow: 0 8px 23px rgb(42 81 65 / 6%);
+}
+
+.philippines-clock-face {
+  width: 48px;
+  height: 48px;
+  position: relative;
+  display: block;
+  flex: none;
+  border: 1.5px solid #b9d5c2;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 8%, #dfa94c 1.5px, transparent 2px),
+    radial-gradient(circle at 92% 50%, #8ab59a 1.5px, transparent 2px),
+    radial-gradient(circle at 50% 92%, #8ab59a 1.5px, transparent 2px),
+    radial-gradient(circle at 8% 50%, #8ab59a 1.5px, transparent 2px),
+    linear-gradient(145deg, #fff, #f3f8f2);
+  box-shadow: inset 0 0 0 4px rgb(228 241 229 / 70%), 0 3px 9px rgb(42 81 65 / 7%);
+}
+
+.clock-hand {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  display: block;
+  border-radius: 999px;
+  transform-origin: 50% 100%;
+  transition: transform .18s linear;
+}
+
+.hour-hand {
+  z-index: 1;
+  width: 3px;
+  height: 12px;
+  background: #315b4a;
+}
+
+.minute-hand {
+  z-index: 2;
+  width: 2px;
+  height: 17px;
+  background: #4a896d;
+}
+
+.second-hand {
+  z-index: 3;
+  width: 1px;
+  height: 19px;
+  background: #dfa94c;
+}
+
+.clock-center {
+  width: 5px;
+  height: 5px;
+  position: absolute;
+  z-index: 4;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  background: #dfa94c;
+  box-shadow: 0 0 0 2px white;
+  transform: translate(-50%, -50%);
+}
+
+.philippines-clock-copy {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.philippines-clock-label {
+  color: #788c7e;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.philippines-clock-time {
+  color: #2b493a;
+  font: 700 17px/1.1 'Outfit', sans-serif;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.philippines-clock-date {
+  overflow: hidden;
+  color: #849186;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.philippines-clock.compact {
+  gap: 9px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.philippines-clock.compact .philippines-clock-face {
+  width: 38px;
+  height: 38px;
+  box-shadow: inset 0 0 0 3px rgb(228 241 229 / 70%), 0 2px 6px rgb(42 81 65 / 6%);
+}
+
+.philippines-clock.compact .hour-hand {
+  height: 9px;
+}
+
+.philippines-clock.compact .minute-hand {
+  height: 13px;
+}
+
+.philippines-clock.compact .second-hand {
+  height: 15px;
+}
+
+.philippines-clock.compact .philippines-clock-label {
+  font-size: 7px;
+  letter-spacing: .8px;
+}
+
+.philippines-clock.compact .philippines-clock-time {
+  font-size: 12px;
+}
+
+.learning-dashboard .page-content > .philippines-clock {
+  margin: 0 0 16px auto;
+}
+
+.management-clock-widget {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+@media (max-width: 700px) {
+  .philippines-clock:not(.compact) {
+    gap: 11px;
+    padding: 11px 13px;
+  }
+
+  .philippines-clock:not(.compact) .philippines-clock-face {
+    width: 42px;
+    height: 42px;
+  }
+
+  .philippines-clock:not(.compact) .hour-hand {
+    height: 10px;
+  }
+
+  .philippines-clock:not(.compact) .minute-hand {
+    height: 15px;
+  }
+
+  .philippines-clock:not(.compact) .second-hand {
+    height: 17px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clock-hand {
+    transition: none;
+  }
+}

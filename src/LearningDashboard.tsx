@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { PhilippinesClock } from './PhilippinesClock'
 
 type AuthUser = { id: number; name: string; email: string }
 type Student = {
@@ -44,9 +45,13 @@ type Notification = {
 type Page = 'Overview' | 'Classroom' | 'Lessons' | 'Practice' | 'Progress' | 'My students' | 'Notifications' | 'Settings'
 
 const lessons = [
-  { id: 'adding-within-10', title: 'Adding within 10', topic: 'ADDITION', description: 'Put numbers together and count on to find the total.' },
-  { id: 'subtracting-within-10', title: 'Taking away within 10', topic: 'SUBTRACTION', description: 'Take away, cross out, and discover what remains.' },
-  { id: 'make-10', title: 'Make 10', topic: 'NUMBER SENSE', description: 'Find number pairs that make ten in a flash.' },
+  { id: 'adding-within-10', title: 'Adding within 10', topic: 'ADDITION', description: 'Put numbers together and count on to find the total.', symbol: '＋', art: 'mint' },
+  { id: 'subtracting-within-10', title: 'Taking away within 10', topic: 'SUBTRACTION', description: 'Take away, cross out, and discover what remains.', symbol: '−', art: 'lavender' },
+  { id: 'make-10', title: 'Make 10', topic: 'NUMBER SENSE', description: 'Find number pairs that make ten in a flash.', symbol: '10', art: 'yellow' },
+  { id: 'addition-make-ten', title: 'Add by Making Ten', topic: 'ADDITION', description: 'Make ten first, then add what remains.', symbol: '＋', art: 'mint' },
+  { id: 'subtraction-count-back', title: 'Count Back to Subtract', topic: 'SUBTRACTION', description: 'Count backward one step at a time to find the difference.', symbol: '−', art: 'lavender' },
+  { id: 'equal-groups', title: 'Multiplication: Equal Groups', topic: 'MULTIPLICATION', description: 'Count equal groups by adding the same number.', symbol: '×', art: 'yellow' },
+  { id: 'sharing-equally', title: 'Division: Share Equally', topic: 'DIVISION', description: 'Share a group fairly so every share is equal.', symbol: '÷', art: 'mint' },
 ]
 const nav: { label: Page; icon: string }[] = [
   { label: 'Overview', icon: '⌂' },
@@ -116,6 +121,12 @@ export function LearningDashboard({ user, onUserUpdated, onSwitchAccount, onSign
   const [practiceComplete, setPracticeComplete] = useState(false)
   const [profileName, setProfileName] = useState(user.name)
   const [savingProfile, setSavingProfile] = useState(false)
+  const [now, setNow] = useState(() => new Date())
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 1000)
+    return () => window.clearInterval(timer)
+  }, [])
 
   useEffect(() => {
     let active = true
@@ -376,7 +387,7 @@ export function LearningDashboard({ user, onUserUpdated, onSwitchAccount, onSign
             const lessonPercent = lessonProgress[lesson.id] ?? 0
             const locked = index > 0 && (lessonProgress[lessons[index - 1].id] ?? 0) < 100
             return <article className={`lesson-card ${locked ? 'is-locked' : ''}`} key={lesson.id}>
-              <div className={`lesson-card-art ${index === 1 ? 'lavender' : index === 2 ? 'yellow' : 'mint'}`}><span>{index === 0 ? '＋' : index === 1 ? '−' : '10'}</span></div>
+              <div className={`lesson-card-art ${lesson.art}`}><span>{lesson.symbol}</span></div>
               <div className="lesson-card-body"><span className="lesson-topic">{lesson.topic} · LESSON 0{index + 1}</span><h3>{lesson.title}</h3><p>{lesson.description}</p><div className="lesson-meter"><div className="progress-track"><span style={{ width: `${lessonPercent}%` }} /></div><span>{lessonPercent ? `${lessonPercent}%` : 'Not started'}</span></div><button className="card-action" disabled={locked} onClick={() => startPractice(lesson.id)}>{locked ? 'Complete the lesson above first' : lessonPercent ? 'Continue lesson →' : 'Start lesson →'}</button></div>
             </article>
           })}
@@ -422,7 +433,7 @@ export function LearningDashboard({ user, onUserUpdated, onSwitchAccount, onSign
         {lessons.map((lesson, index) => {
           const lessonPercent = lessonProgress[lesson.id] ?? 0
           const locked = index > 0 && (lessonProgress[lessons[index - 1].id] ?? 0) < 100
-          return <article className={`lesson-card ${locked ? 'is-locked' : ''}`} key={lesson.id}><div className={`lesson-card-art ${index === 1 ? 'lavender' : index === 2 ? 'yellow' : 'mint'}`}><span>{index === 0 ? '＋' : index === 1 ? '−' : '10'}</span></div><div className="lesson-card-body"><span className="lesson-topic">{lesson.topic} · LESSON 0{index + 1}</span><h3>{lesson.title}</h3><p>{lesson.description}</p><div className="lesson-meter"><div className="progress-track"><span style={{ width: `${lessonPercent}%` }} /></div><span>{lessonPercent ? `${lessonPercent}%` : 'Not started'}</span></div><button className="card-action" disabled={locked} onClick={() => startPractice(lesson.id)}>{locked ? 'Complete the lesson above first' : lessonPercent ? 'Continue lesson →' : 'Start lesson →'}</button></div></article>
+          return <article className={`lesson-card ${locked ? 'is-locked' : ''}`} key={lesson.id}><div className={`lesson-card-art ${lesson.art}`}><span>{lesson.symbol}</span></div><div className="lesson-card-body"><span className="lesson-topic">{lesson.topic} · LESSON 0{index + 1}</span><h3>{lesson.title}</h3><p>{lesson.description}</p><div className="lesson-meter"><div className="progress-track"><span style={{ width: `${lessonPercent}%` }} /></div><span>{lessonPercent ? `${lessonPercent}%` : 'Not started'}</span></div><button className="card-action" disabled={locked} onClick={() => startPractice(lesson.id)}>{locked ? 'Complete the lesson above first' : lessonPercent ? 'Continue lesson →' : 'Start lesson →'}</button></div></article>
         })}
       </section>
     </>
@@ -506,10 +517,10 @@ export function LearningDashboard({ user, onUserUpdated, onSwitchAccount, onSign
       <aside className="sidebar"><div className="brand"><div className="brand-mark"><span>∑</span><i /></div><div className="brand-copy"><b>arallink<span>.</span></b><small>for numbers</small></div></div>
         <div className="class-selector"><span className="class-avatar">{user.name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()}</span><span className="class-selector-copy"><b>{user.name}’s class</b><small>Grade 1 · {classroomName}</small></span></div>
         <nav className="nav-wrap" aria-label="Main navigation">{nav.map(({ label, icon }) => <button className={`nav-item ${page === label ? 'active' : ''}`} key={label} onClick={() => setPage(label)}><span aria-hidden="true">{icon}</span>{label}{label === 'Notifications' && unreadCount > 0 && <span className="nav-badge">{unreadCount}</span>}</button>)}</nav>
-        <div className="sidebar-bottom"><div className="sidebar-help"><b>Every learner starts somewhere.</b><p>Small steps make strong number thinkers.</p></div><button className={`settings-link ${page === 'Settings' ? 'active' : ''}`} onClick={() => setPage('Settings')}>Settings</button><div className="sidebar-profile"><div className="guardian-avatar">{user.name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()}</div><span><b>{user.name}</b><small>{user.email}</small></span></div></div>
+        <div className="sidebar-bottom"><div className="sidebar-help"><b>Every learner starts somewhere.</b><p>Small steps make strong number thinkers.</p></div><a className="settings-link management-link" href="/management">Manage classroom accounts</a><button className={`settings-link ${page === 'Settings' ? 'active' : ''}`} onClick={() => setPage('Settings')}>Settings</button><div className="sidebar-profile"><div className="guardian-avatar">{user.name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()}</div><span><b>{user.name}</b><small>{user.email}</small></span></div></div>
       </aside>
       <main className="main-area"><header className="topbar"><div className="breadcrumb">Classroom <span>/</span> <b>{page}</b></div><div className="topbar-actions"><span className="student-switcher"><span><b>{selectedStudent?.name ?? 'No student selected'}</b><small>{selectedStudent ? `Grade ${selectedStudent.grade}` : 'Add your first profile'}</small></span></span><button className="account-logout" type="button" onClick={onSignOut} aria-label="Sign out of teacher account" title="Sign out"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg><span>Sign out</span></button></div></header>
-        <div className="page-content">{loading ? <div className="journey-loading" role="status">Loading your saved classroom…</div> : <>{error && <p className="learning-error" role="alert">{error}</p>}{students.length === 0 && page !== 'Classroom' ? renderJourneyStart() : renderPage()}</>}<footer className="page-footer"><span>Made for curious minds <span>✦</span></span><span>AralLink for Numbers · Grade 1 mathematics</span></footer></div>
+        <div className="page-content">{page === 'Overview' && <PhilippinesClock now={now} />}{loading ? <div className="journey-loading" role="status">Loading your saved classroom…</div> : <>{error && <p className="learning-error" role="alert">{error}</p>}{students.length === 0 && page !== 'Classroom' ? renderJourneyStart() : renderPage()}</>}<footer className="page-footer"><span>Made for curious minds <span>✦</span></span><span>AralLink for Numbers · Grade 1 mathematics</span></footer></div>
       </main>
     </div>
   )

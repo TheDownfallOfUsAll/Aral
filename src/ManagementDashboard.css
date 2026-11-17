@@ -93,6 +93,7 @@
   text-align: left;
   font-size: 12px;
   font-weight: 600;
+  transition: background .2s ease, color .2s ease, transform .2s ease;
 }
 
 .management-nav-item > span {
@@ -112,6 +113,10 @@
 .management-nav-item.active {
   background: #f1effc;
   color: #705bd1;
+}
+
+.management-nav-item:hover {
+  transform: translateX(3px);
 }
 
 .management-nav-item.active > span {
@@ -160,6 +165,121 @@
 
 .management-back-link:hover {
   color: #705bd1;
+}
+
+.management-link {
+  display: flex;
+  align-items: center;
+  color: #705bd1;
+  text-decoration: none;
+}
+
+.management-access-gate {
+  width: min(100% - 36px, 480px);
+  margin: auto;
+  padding: 38px;
+  border: 1px solid #eeefec;
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 20px 60px rgb(52 49 62 / 8%);
+}
+
+.management-access-gate .management-brand-mark {
+  margin-bottom: 25px;
+}
+
+.management-access-gate h1 {
+  margin: 9px 0;
+  color: #34313e;
+  font: 700 25px/1.2 'Manrope', sans-serif;
+}
+
+.management-access-gate p {
+  margin: 0 0 20px;
+  color: #81838a;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.management-access-gate .management-alert {
+  margin-bottom: 14px;
+}
+
+.management-classroom-access {
+  display: grid;
+  grid-template-columns: auto minmax(160px, 1fr) auto auto;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 17px;
+  padding: 15px 17px;
+  border: 1px solid #e8eee5;
+  border-radius: 14px;
+  background: linear-gradient(110deg, #fbfdf9, #f3f8f2);
+}
+
+.management-classroom-access-icon {
+  width: 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #e7f1e4;
+  color: #638e6c;
+  font-size: 21px;
+}
+
+.management-classroom-access > div:nth-child(2) {
+  display: grid;
+  gap: 4px;
+}
+
+.management-classroom-access > div:nth-child(2) strong {
+  color: #4a5449;
+  font: 700 12px 'Manrope', sans-serif;
+}
+
+.management-classroom-access > div:nth-child(2) small {
+  color: #888f85;
+  font-size: 9px;
+}
+
+.management-join-code {
+  display: grid;
+  gap: 3px;
+  padding: 0 12px;
+  border-left: 1px solid #dfe8dc;
+}
+
+.management-join-code span {
+  color: #899184;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.management-join-code b {
+  color: #4c7654;
+  font: 800 17px 'Manrope', sans-serif;
+  letter-spacing: 2px;
+}
+
+.management-copy-error {
+  grid-column: 2 / -1;
+  color: #a15146;
+  font-size: 9px;
+}
+
+.management-classroom-note {
+  padding: 11px 12px;
+  border-radius: 8px;
+  background: #f4f7f1;
+  color: #737d70;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.management-classroom-note b {
+  color: #4b7653;
 }
 
 .management-main {
@@ -282,6 +402,7 @@
   background: #fff5db;
   color: #dfab4e;
   font-size: 20px;
+  animation: management-sun-turn 24s linear infinite;
 }
 
 .management-date-card b {
@@ -298,6 +419,15 @@
   margin-bottom: 17px;
   border-radius: 17px;
   background: linear-gradient(110deg, #eeeaf9 0%, #f0edfb 57%, #e8f1eb 100%);
+}
+
+.management-overview-banner::before {
+  content: '';
+  position: absolute;
+  inset: -65%;
+  background: radial-gradient(ellipse at center, rgb(255 255 255 / 54%), transparent 58%);
+  pointer-events: none;
+  animation: management-light-drift 15s ease-in-out infinite alternate;
 }
 
 .management-overview-banner > div:first-child {
@@ -347,14 +477,18 @@
 }
 
 .management-primary {
+  position: relative;
   background: #7159d2;
-  box-shadow: 0 5px 12px #725ad22b;
+  box-shadow: 0 5px 13px #725ad23d, 0 0 0 0 #9c87ff00;
   color: white;
+  animation: management-button-glow 3.2s ease-in-out infinite;
 }
 
 .management-primary:not(:disabled):hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.015);
   background: #5e48c0;
+  box-shadow: 0 8px 20px #725ad259, 0 0 21px #9c87ff63;
+  animation: none;
 }
 
 .management-primary:disabled {
@@ -392,6 +526,7 @@
   box-shadow: 0 14px 26px #8d80bc1c;
   color: #8b72d5;
   font: 800 49px 'Manrope', sans-serif;
+  animation: management-number-float 5s ease-in-out infinite;
 }
 
 .management-art-number.second {
@@ -399,6 +534,7 @@
   transform: translateY(-43%) rotate(9deg);
   background: #fff7dc;
   color: #dea74d;
+  animation-delay: -2.4s;
 }
 
 .management-art-plus {
@@ -420,6 +556,7 @@
 .management-art-spark {
   top: 24%;
   left: 57%;
+  animation: management-sparkle 3.2s ease-in-out infinite;
 }
 
 .management-art-star {
@@ -427,6 +564,7 @@
   bottom: 20%;
   color: #9c8bd5;
   font-size: 32px;
+  animation: management-sparkle 4s ease-in-out infinite reverse;
 }
 
 .management-stat-grid {
@@ -443,6 +581,13 @@
   border: 1px solid #eeefec;
   border-radius: 13px;
   background: white;
+  transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease;
+}
+
+.management-stat-card:hover {
+  transform: translateY(-4px);
+  border-color: #e2dcf6;
+  box-shadow: 0 12px 28px #42404c0d;
 }
 
 .management-stat-icon {
@@ -554,6 +699,11 @@
   color: #72777c;
   font-size: 10px;
   white-space: nowrap;
+  transition: background .16s ease;
+}
+
+.management-table tbody tr:hover td {
+  background: #fbfaff;
 }
 
 .management-table tr:first-child td {
@@ -610,10 +760,13 @@
   color: #6d64aa;
   font-size: 9px;
   font-weight: 600;
+  transition: color .16s ease, background .16s ease, border-color .16s ease, transform .16s ease;
 }
 
 .management-row-actions button:hover {
   background: #f5f3fc;
+  border-color: #ded8f5;
+  transform: translateY(-1px);
 }
 
 .management-row-actions button.delete {
@@ -705,6 +858,10 @@
   box-shadow: 0 22px 70px #20202b30;
 }
 
+.management-form-dialog[open] {
+  animation: management-dialog-enter .24s ease-out both;
+}
+
 .management-dialog-heading {
   display: flex;
   align-items: flex-start;
@@ -788,6 +945,107 @@
   outline-offset: 2px;
 }
 
+@keyframes management-enter {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes management-button-glow {
+  0%, 100% {
+    box-shadow: 0 5px 13px #725ad23d, 0 0 0 0 #9c87ff00;
+  }
+
+  50% {
+    box-shadow: 0 6px 16px #725ad247, 0 0 16px 2px #9c87ff40;
+  }
+}
+
+@keyframes management-light-drift {
+  from {
+    transform: translate3d(-4%, 0, 0);
+  }
+
+  to {
+    transform: translate3d(8%, 4%, 0);
+  }
+}
+
+@keyframes management-number-float {
+  0%, 100% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: 0 -8px;
+  }
+}
+
+@keyframes management-sparkle {
+  0%, 100% {
+    opacity: .7;
+    scale: .9;
+  }
+
+  50% {
+    opacity: 1;
+    scale: 1.16;
+  }
+}
+
+@keyframes management-sun-turn {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes management-dialog-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .management-welcome,
+  .management-overview-banner,
+  .management-stat-card,
+  .management-panel {
+    animation: management-enter .55s cubic-bezier(.2, .75, .25, 1) both;
+  }
+
+  .management-overview-banner {
+    animation-delay: 80ms;
+  }
+
+  .management-stat-card:nth-child(1) {
+    animation-delay: 130ms;
+  }
+
+  .management-stat-card:nth-child(2) {
+    animation-delay: 210ms;
+  }
+
+  .management-stat-card:nth-child(3) {
+    animation-delay: 290ms;
+  }
+
+  .management-panel {
+    animation-delay: 360ms;
+  }
+}
+
 @media (max-width: 900px) {
   .management-sidebar {
     width: 210px;
@@ -807,11 +1065,48 @@
     right: 1%;
     width: 40%;
   }
+
+  .management-classroom-access {
+    grid-template-columns: auto minmax(120px, 1fr) auto;
+  }
+
+  .management-classroom-access > .management-secondary {
+    grid-column: 2 / -1;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 600px) {
+  .management-access-gate {
+    padding: 26px;
+  }
+
+  .management-classroom-access {
+    grid-template-columns: auto 1fr;
+  }
+
+  .management-join-code {
+    grid-column: 2;
+    border-left: 0;
+    padding: 0;
+  }
+
+  .management-classroom-access > .management-secondary {
+    grid-column: 2;
+  }
+
+  .management-copy-error {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .management-primary,
-  .management-secondary {
-    transition: none;
+  .management-app *,
+  .management-app *::before,
+  .management-app *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
   }
 }

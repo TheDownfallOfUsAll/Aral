@@ -5,6 +5,7 @@ import { AuthScreen } from './AuthScreen'
 import { LearningDashboard } from './LearningDashboard'
 import { ManagementDashboard } from './ManagementDashboard'
 import { StudentDashboard } from './StudentDashboard'
+import './DesignRefresh.css'
 
 type AuthUser = { id: number; name: string; email: string }
 type StudentSession = { id: number; name: string; grade: number; classroom: { id: number; name: string } }
