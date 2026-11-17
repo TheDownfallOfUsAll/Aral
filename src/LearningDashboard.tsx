@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { CubeModel } from './CubeModel'
 import { PhilippinesClock } from './PhilippinesClock'
 
 type AuthUser = { id: number; name: string; email: string }
@@ -468,7 +469,7 @@ export function LearningDashboard({ user, onUserUpdated, onSwitchAccount, onSign
       ) : (
         <section className="practice-card">
           <div className="practice-progress"><span>QUESTION {questionIndex + 1} OF {practiceQuestions.length}</span><div className="progress-track"><span style={{ width: `${(questionIndex + 1) / practiceQuestions.length * 100}%` }} /></div><span className="practice-stars">★</span></div>
-          {activeQuestion ? <><div className="math-prompt"><span className="prompt-label">Choose the answer</span><div className="equation">{activeQuestion.expression} <span>=</span> <b>?</b></div></div><div className="answer-grid" role="group" aria-label="Choose your answer">{activeQuestion.choices.map((choice) => <button key={choice} className={`answer-choice ${selectedAnswer === choice ? 'selected' : ''}`} onClick={() => chooseAnswer(choice)} aria-pressed={selectedAnswer === choice}>{choice}</button>)}</div>{answered && <p className="answer-feedback" role="status">Answer recorded. You’ll see the explanation after you finish.</p>}<div className="practice-actions"><button className="primary-button" disabled={!answered || savingPractice} onClick={() => void advancePractice()}>{savingPractice ? 'Saving…' : questionIndex === practiceQuestions.length - 1 ? 'Finish and check' : 'Next question →'}</button></div></> : <div className="journey-loading" role="status">Loading practice questions…</div>}
+          {activeQuestion ? <><div className="math-prompt"><span className="prompt-label">Choose the answer</span><div className="equation">{activeQuestion.expression} <span>=</span> <b>?</b></div></div><CubeModel expression={activeQuestion.expression} /><div className="answer-grid" role="group" aria-label="Choose your answer">{activeQuestion.choices.map((choice) => <button key={choice} className={`answer-choice ${selectedAnswer === choice ? 'selected' : ''}`} onClick={() => chooseAnswer(choice)} aria-pressed={selectedAnswer === choice}>{choice}</button>)}</div>{answered && <p className="answer-feedback" role="status">Answer recorded. You’ll see the explanation after you finish.</p>}<div className="practice-actions"><button className="primary-button" disabled={!answered || savingPractice} onClick={() => void advancePractice()}>{savingPractice ? 'Saving…' : questionIndex === practiceQuestions.length - 1 ? 'Finish and check' : 'Next question →'}</button></div></> : <div className="journey-loading" role="status">Loading practice questions…</div>}
         </section>
       )}
     </div>

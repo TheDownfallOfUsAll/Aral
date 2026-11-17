@@ -1772,3 +1772,134 @@ body {
     flex-direction: column;
   }
 }
+
+.cube-model {
+  max-width: 560px;
+  margin: 0 auto 20px;
+  padding: 14px 17px;
+  border: 1px solid #dfe9e2;
+  border-radius: 14px;
+  background: linear-gradient(140deg, #f8fbf6, #f1f7f0);
+}
+
+.cube-model-title {
+  display: block;
+  margin-bottom: 12px;
+  color: #668274;
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.cube-model-workspace {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.cube-group {
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+}
+
+.cube-group > span {
+  color: #71817c;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.cube-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+  max-width: 230px;
+}
+
+.math-cube {
+  position: relative;
+  display: inline-block;
+  width: 23px;
+  height: 23px;
+  flex: 0 0 23px;
+  border: 1px solid rgb(35 105 82 / 22%);
+  border-radius: 5px;
+  background: linear-gradient(145deg, #92c989 0%, #59a575 55%, #3b8967 100%);
+  box-shadow: inset 2px 2px 2px rgb(255 255 255 / 48%), inset -2px -2px 2px rgb(27 96 65 / 20%), 0 2px 0 #347c5d;
+}
+
+.cube-row-second .math-cube {
+  border-color: rgb(166 112 32 / 22%);
+  background: linear-gradient(145deg, #ffe09a 0%, #f1bd61 55%, #d99a3f 100%);
+  box-shadow: inset 2px 2px 2px rgb(255 255 255 / 55%), inset -2px -2px 2px rgb(146 91 20 / 18%), 0 2px 0 #c18732;
+}
+
+.math-cube.is-removed {
+  background-image:
+    linear-gradient(45deg, transparent 46%, #a64e43 47% 53%, transparent 54%),
+    linear-gradient(-45deg, transparent 46%, #a64e43 47% 53%, transparent 54%);
+  opacity: .7;
+}
+
+.cube-operation {
+  color: #789084;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.cube-multiplication {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.cube-division {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+}
+
+.cube-share-targets {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.cube-share-target {
+  display: grid;
+  min-width: 62px;
+  min-height: 47px;
+  place-items: center;
+  padding: 5px;
+  border: 2px dashed #c5d8c8;
+  border-radius: 10px;
+  background: #fffefa;
+  color: #71817c;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+@media (max-width: 500px) {
+  .cube-model {
+    padding: 12px 9px;
+  }
+
+  .cube-model-workspace,
+  .cube-division {
+    gap: 8px;
+  }
+
+  .cube-multiplication {
+    gap: 10px;
+  }
+
+  .cube-row {
+    max-width: 170px;
+  }
+}

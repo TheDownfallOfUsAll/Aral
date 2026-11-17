@@ -91,6 +91,9 @@ describe('learning API', () => {
       assert.equal(roster.body.students.length, 1)
       assert.equal(roster.body.students[0].name, 'Mia Chen')
 
+      const questions = await callApi(db, 1, 'GET', `/api/learning/practice-questions?studentId=${studentId}&activityId=quick-practice`)
+      assert.deepEqual(questions.body.questions.map(({ expression }) => expression), ['4 + 3', '9 - 5', '3 × 2', '8 ÷ 2'])
+
       const invalidResult = await callApi(db, 1, 'POST', '/api/learning/practice-sessions', {
         studentId,
         activityId: 'quick-practice',
@@ -101,7 +104,7 @@ describe('learning API', () => {
       const savedResult = await callApi(db, 1, 'POST', '/api/learning/practice-sessions', {
         studentId,
         activityId: 'quick-practice',
-        answers: [7, 4, 8, 6],
+        answers: [7, 4, 6, 3],
         durationSeconds: 90,
       })
       assert.equal(savedResult.statusCode, 201)
@@ -339,7 +342,7 @@ describe('learning API', () => {
         const result = await callApi(db, 1, 'POST', '/api/learning/practice-sessions', {
           studentId,
           activityId: 'quick-practice',
-          answers: [7, 4, 8, 4],
+          answers: [7, 4, 6, 3],
         })
         assert.equal(result.statusCode, 201)
       }

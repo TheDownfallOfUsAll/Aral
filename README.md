@@ -105,6 +105,7 @@ Redeploy after configuring the variables. The API returns a clear `503` response
 
 - Seven student lessons covering addition and subtraction within 10, number sense, equal groups, and fair sharing
 - Five-question student quizzes for addition, subtraction, multiplication, division, and number sense
+- Visual cube counters in student lessons and mixed teacher-assigned practice
 - Student lessons, progress, stars, badges, and completion views
 - Teacher classroom roster and progress overview
 - Classroom notifications for teachers and guardians

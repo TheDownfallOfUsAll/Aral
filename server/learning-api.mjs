@@ -22,8 +22,8 @@ const lessons = [
 const practiceQuestions = [
   { expression: '4 + 3', answer: 7, choices: [6, 7, 8], explanation: 'Start at 4 and count three steps: 5, 6, 7.' },
   { expression: '9 - 5', answer: 4, choices: [3, 4, 5], explanation: 'Start at 9 and count back five steps: 8, 7, 6, 5, 4.' },
-  { expression: '6 + 2', answer: 8, choices: [7, 8, 9], explanation: 'Start at 6 and count two steps: 7, 8.' },
-  { expression: '10 - 6', answer: 4, choices: [4, 5, 6], explanation: 'Start at 10 and count back six steps: 9, 8, 7, 6, 5, 4.' },
+  { expression: '3 × 2', answer: 6, choices: [5, 6, 7], explanation: 'Three groups with two cubes in each are 2 + 2 + 2, which is 6.' },
+  { expression: '8 ÷ 2', answer: 4, choices: [3, 4, 5], explanation: 'Share 8 cubes equally into 2 groups. Each group gets 4.' },
 ]
 const quizTopics = [
   {
